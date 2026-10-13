@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЕГЭ История — Тренажёр</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f0e6; --card: #fff; --ink: #232323; --muted: #6b6b6b;
+    --blue: #1a3a5c; --gold: #c9a961;
+    --green-bg: #d7f0d8; --green-br: #2e7d32;
+    --red-bg: #f8d7da; --red-br: #c62828;
+    --line: #e3ddce;
+  }
+  html, body { min-height: 100%; }
+  body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  #app { max-width: 880px; margin: 0 auto; padding: 28px 18px 60px; transition: max-width .25s; }
+  body.ref-open #app { max-width: 1280px; }
+
+  .brand { text-align: center; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 2px solid var(--gold); }
+  .brand h1 { font-size: 30px; letter-spacing: 1px; color: var(--blue); font-weight: 700; }
+  .brand p { color: var(--muted); font-size: 14px; margin-top: 6px; font-style: italic; }
+
+  .home-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 640px) { .home-cards { grid-template-columns: 1fr; } }
+  .home-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 18px; text-align: center; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; }
+  .home-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 8px 20px rgba(26,58,92,.10); }
+  .home-card .icon { font-size: 40px; margin-bottom: 10px; }
+  .home-card h3 { color: var(--blue); font-size: 20px; margin-bottom: 6px; }
+  .home-card p { color: var(--muted); font-size: 13px; }
+
+  .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .arrow-btn { background: var(--card); border: 1px solid var(--line); border-radius: 10px; width: 42px; height: 42px; font-size: 20px; cursor: pointer; color: var(--blue); display: flex; align-items: center; justify-content: center; transition: background .15s, border-color .15s; }
+  .arrow-btn:hover:not(:disabled) { background: #f0e9da; border-color: var(--gold); }
+  .arrow-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  .section-title { font-size: 22px; color: var(--blue); margin-bottom: 4px; }
+  .section-sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+
+  .period-list { display: flex; flex-direction: column; gap: 10px; }
+  .period-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color .15s, transform .15s; font-size: 15px; }
+  .period-item:hover { border-color: var(--gold); transform: translateX(3px); }
+  .period-item.disabled { opacity: .5; cursor: default; }
+  .period-item.disabled:hover { border-color: var(--line); transform: none; }
+  .period-item .count { color: var(--muted); font-size: 13px; font-family: sans-serif; }
+  .soon-badge { background: #f0e9da; color: #8a7a55; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-family: sans-serif; }
+
+  .level-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+  .level-cards.three { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 760px) { .level-cards, .level-cards.three { grid-template-columns: 1fr; } }
+  .level-card { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 28px 20px; cursor: pointer; text-align: center; transition: transform .15s, border-color .15s, box-shadow .15s; }
+  .level-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 8px 20px rgba(26,58,92,.10); }
+  .level-card .icon { font-size: 46px; margin-bottom: 10px; }
+  .level-card h3 { color: var(--blue); font-size: 19px; margin-bottom: 8px; }
+  .level-card p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .level-card .tag { display: inline-block; margin-top: 12px; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-family: sans-serif; }
+  .level-card.easy .tag { background: #d7f0d8; color: #2e7d32; }
+  .level-card.hard .tag { background: #f8d7da; color: #c62828; }
+  .level-card.ref .tag { background: #f0e9da; color: #8a7a55; }
+
+  .quiz-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .progress-text { color: var(--muted); font-size: 13px; font-family: sans-serif; }
+  .mini-btn { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 13px; color: var(--blue); font-family: sans-serif; transition: background .15s, border-color .15s; }
+  .mini-btn:hover { background: #f0e9da; border-color: var(--gold); }
+  .mini-btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .mini-btn.primary:hover { background: #b3924d; }
+  .progress-bar { height: 6px; background: #e8e1d0; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+  .progress-bar > div { height: 100%; background: var(--gold); width: 0%; transition: width .3s; }
+
+  .question-box { background: var(--card); border: 2px solid var(--blue); border-radius: 14px; padding: 22px 20px; margin-bottom: 18px; text-align: center; }
+  .question-box .q-label { color: var(--gold); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; font-family: sans-serif; }
+  .question-box .q-text { font-size: 28px; color: var(--blue); font-weight: 700; }
+  .question-box .q-text-sm { font-size: 20px; color: var(--blue); font-weight: 700; }
+  .question-box .q-desc { color: var(--muted); font-size: 14px; margin-top: 8px; font-style: italic; }
+
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 14px 16px; cursor: pointer; text-align: left; transition: border-color .15s, background .15s, transform .1s; font-family: inherit; font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 14px; width: 100%; }
+  .option:hover:not(.locked) { border-color: var(--gold); transform: translateX(3px); }
+  .option .num { background: #f0e9da; color: var(--blue); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: sans-serif; flex-shrink: 0; font-size: 14px; }
+  .option .opt-body { flex: 1; }
+  .option .opt-title { font-weight: 700; color: var(--blue); }
+  .option .opt-meta { color: var(--muted); font-size: 13px; font-family: sans-serif; margin-top: 2px; }
+  .option.correct { background: var(--green-bg); border-color: var(--green-br); }
+  .option.correct .num { background: var(--green-br); color: #fff; }
+  .option.wrong { background: var(--red-bg); border-color: var(--red-br); }
+  .option.wrong .num { background: var(--red-br); color: #fff; }
+  .option.locked { cursor: default; }
+
+  .typing-area { display: flex; gap: 10px; margin-top: 4px; }
+  .date-input { flex: 1; padding: 14px 16px; border: 2px solid var(--line); border-radius: 12px; font-size: 16px; font-family: inherit; color: var(--ink); background: var(--card); transition: border-color .15s; }
+  .date-input:focus { outline: none; border-color: var(--gold); }
+  .date-input:disabled { background: #f5f0e6; color: var(--muted); }
+  .feedback { margin-top: 14px; padding: 14px 18px; border-radius: 12px; font-size: 15px; border: 2px solid; }
+  .feedback.fb-correct { background: var(--green-bg); border-color: var(--green-br); color: #1b5e20; }
+  .feedback.fb-wrong { background: var(--red-bg); border-color: var(--red-br); color: #b71c1c; }
+
+  .ege-table { background: var(--card); border: 2px solid var(--blue); border-radius: 14px; padding: 16px; margin-bottom: 18px; }
+  .ege-row { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
+  .ege-row:last-child { border-bottom: none; }
+  .ege-letter { background: #f0e9da; color: var(--blue); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: sans-serif; flex-shrink: 0; font-size: 14px; }
+  .ege-prompt { flex: 1; font-size: 15px; color: var(--ink); min-width: 160px; }
+  .ege-nums { display: flex; gap: 6px; flex-shrink: 0; }
+  .ege-num-btn { width: 32px; height: 32px; border-radius: 8px; border: 2px solid var(--line); background: #fff; color: var(--blue); font-family: sans-serif; font-weight: 700; cursor: pointer; font-size: 13px; transition: all .12s; }
+  .ege-num-btn:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-1px); }
+  .ege-num-btn.selected { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .ege-num-btn.correct { background: var(--green-br); color: #fff; border-color: var(--green-br); }
+  .ege-num-btn.wrong { background: var(--red-br); color: #fff; border-color: var(--red-br); }
+  .ege-num-btn:disabled { cursor: default; }
+
+  .ege-options-box { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 18px; }
+  .ege-options-box .opt-row { display: flex; gap: 12px; padding: 8px 0; align-items: flex-start; border-bottom: 1px dashed var(--line); }
+  .ege-options-box .opt-row:last-child { border-bottom: none; }
+  .ege-options-box .num-badge { background: #f0e9da; color: var(--blue); min-width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: sans-serif; font-size: 13px; flex-shrink: 0; }
+  .ege-options-box .opt-text { font-size: 14px; color: var(--ink); }
+
+  .result { background: var(--card); border: 2px solid var(--gold); border-radius: 16px; padding: 34px 24px; text-align: center; }
+  .result .score { font-size: 54px; color: var(--blue); font-weight: 700; margin: 10px 0; }
+  .result .score span { font-size: 26px; color: var(--muted); }
+  .result .verdict { font-size: 18px; color: var(--ink); margin: 16px auto 6px; max-width: 540px; }
+  .result .emoji { font-size: 56px; margin-bottom: 8px; }
+  .result-actions { margin-top: 24px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 12px 22px; cursor: pointer; font-size: 15px; font-family: inherit; transition: background .15s, transform .1s; }
+  .btn-primary:hover { background: #244b74; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--blue); border: 1px solid var(--line); border-radius: 10px; padding: 12px 22px; cursor: pointer; font-size: 15px; font-family: inherit; transition: background .15s, border-color .15s; }
+  .btn-ghost:hover { background: #f0e9da; border-color: var(--gold); }
+
+  .fade-in { animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .ref-layout { display: grid; grid-template-columns: 1fr; gap: 18px; transition: grid-template-columns .3s ease; }
+  .ref-layout.open { grid-template-columns: minmax(0, 1fr) 420px; }
+  .ref-side { display: none; max-height: 82vh; overflow-y: auto; background: var(--card); border: 2px solid var(--gold); border-radius: 14px; padding: 14px 16px; }
+  .ref-layout.open .ref-side { display: block; }
+  @media (max-width: 980px) {
+    .ref-layout.open { grid-template-columns: 1fr; }
+    .ref-layout.open .ref-side { max-height: 500px; }
+  }
+  .ref-title { font-size: 18px; color: var(--blue); margin-bottom: 4px; font-weight: 700; }
+  .ref-sub { font-size: 12px; color: var(--muted); font-family: sans-serif; margin-bottom: 12px; }
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ref-table th, .ref-table td { text-align: left; padding: 6px 8px; border-bottom: 1px dashed var(--line); vertical-align: top; }
+  .ref-table th { color: var(--gold); font-family: sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; position: sticky; top: 0; background: var(--card); }
+  .ref-table td.name { color: var(--blue); font-weight: 700; }
+  .ref-table td.meta { color: var(--muted); font-size: 12px; font-family: sans-serif; white-space: nowrap; }
+  .ref-table td.ref-period { background: #f0e9da; color: #1a3a5c; font-weight: 700; font-family: sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .ref-table tr:hover td:not(.ref-period) { background: #faf5e8; }
+
+  .ref-full-wrap { background: var(--card); border: 2px solid var(--gold); border-radius: 14px; padding: 18px 20px; max-height: none; }
+  .ref-search { width: 100%; padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 15px; background: var(--card); margin-bottom: 14px; }
+  .ref-search:focus { outline: none; border-color: var(--gold); }
+
+  .peeked-badge { background: #f0e9da; color: #8a7a55; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-family: sans-serif; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   1. КУЛЬТУРА — СТРУКТУРИРОВАННЫЙ СПРАВОЧНИК
+   ========================================================= */
+const CULTURE_DATA = [
+  { name:'Десятинная церковь', city:'Киев', year:'996', ruler:'Владимир Святой', author:'', desc:'Первый каменный храм Киевской Руси, разрушен монголами в 1240 г.' },
+  { name:'Софийский собор в Киеве', city:'Киев', year:'1037', ruler:'Ярослав Мудрый', author:'', desc:'13-главый храм, символ могущества Руси, место захоронения Ярослава Мудрого' },
+  { name:'Софийский собор в Новгороде', city:'Новгород', year:'1045–1050', ruler:'Ярослав Мудрый', author:'', desc:'5-главый храм, символ новгородской независимости, кафедральный собор' },
+  { name:'Софийский собор в Полоцке', city:'Полоцк', year:'1030–1060', ruler:'Всеслав Чародей', author:'', desc:'Один из древнейших каменных храмов, символ Полоцкого княжества' },
+  { name:'Церковь Спаса на Нередице', city:'под Новгородом', year:'1198', ruler:'Ярослав Владимирович', author:'', desc:'Одноглавый храм, шедевр новгородского зодчества, фрески. Разрушен в ВОВ, восстановлен' },
+  { name:'Церковь Бориса и Глеба в Кидекше', city:'Кидекша', year:'1152', ruler:'Юрий Долгорукий', author:'', desc:'Первый белокаменный храм Северо-Восточной Руси' },
+  { name:'Собор Спаса-Преображения в Переяславле-Залесском', city:'Переяславль-Залесский', year:'1152–1157', ruler:'Юрий Долгорукий', author:'', desc:'Один из первых белокаменных храмов Владимиро-Суздальской земли' },
+  { name:'Успенский собор во Владимире', city:'Владимир', year:'1158–1160', ruler:'Андрей Боголюбский', author:'', desc:'Главный храм Владимиро-Суздальского княжества, образец для Успенского собора Московского Кремля' },
+  { name:'Золотые ворота во Владимире', city:'Владимир', year:'1164', ruler:'Андрей Боголюбский', author:'', desc:'Оборонительное сооружение, триумфальная арка, символ могущества Владимира' },
+  { name:'Церковь Покрова на Нерли', city:'под Владимиром', year:'1165', ruler:'Андрей Боголюбский', author:'', desc:'Шедевр белокаменного зодчества, построен в память о погибшем сыне князя Изяславе' },
+  { name:'Дмитриевский собор во Владимире', city:'Владимир', year:'1194–1197', ruler:'Всеволод Большое Гнездо', author:'', desc:'Храм с богатой белокаменной резьбой, символ могущества княжества' },
+  { name:'Георгиевский собор в Юрьеве-Польском', city:'Юрьев-Польский', year:'1230–1234', ruler:'Святослав Всеволодович', author:'', desc:'Последний белокаменный храм домонгольской Руси, знаменит резьбой' },
+  { name:'Спасо-Преображенский собор Евфросиньевского монастыря в Полоцке', city:'Полоцк', year:'1161', ruler:'Евфросиния Полоцкая', author:'', desc:'Один из древнейших сохранившихся храмов Беларуси' },
+  { name:'Георгиевский собор Юрьева монастыря', city:'Великий Новгород', year:'1119', ruler:'Всеволод Мстиславич', author:'', desc:'Один из первых каменных храмов Новгорода, фрески' },
+  { name:'Церковь Федора Стратилата на Ручью', city:'Новгород', year:'1360–1361', ruler:'посадник Семён Андреевич', author:'', desc:'Классический памятник новгородского зодчества XIV в.' },
+  { name:'Церковь Спаса Преображения на Ильине улице', city:'Новгород', year:'1374', ruler:'посадник Семён Андреевич', author:'', desc:'Росписи Феофана Грека, шедевр новгородской монументальной живописи' },
+  { name:'Троицкий собор Троице-Сергиевой лавры', city:'Сергиев Посад', year:'1422–1423', ruler:'игумен Никон', author:'', desc:'Главный храм монастыря, усыпальница Сергия Радонежского' },
+  { name:'Спасский собор Андроникова монастыря', city:'Москва', year:'1420–1427', ruler:'Андроник', author:'', desc:'Древнейший сохранившийся храм Москвы, фрески Андрея Рублёва' },
+  { name:'Успенский собор Московского Кремля', city:'Москва', year:'1475–1479', ruler:'', author:'Аристотель Фиораванти', desc:'Главный храм Московского государства, усыпальница митрополитов и патриархов' },
+  { name:'Благовещенский собор Московского Кремля', city:'Москва', year:'1484–1489', ruler:'', author:'псковские мастера', desc:'Домовая церковь московских государей' },
+  { name:'Архангельский собор Московского Кремля', city:'Москва', year:'1505–1508', ruler:'', author:'Алевиз Новый', desc:'Усыпальница московских князей и царей' },
+  { name:'Колокольня Ивана Великого', city:'Москва', year:'1505–1508', ruler:'', author:'Бон Фрязин', desc:'Главная вертикаль Кремля, столп, объединяющий соборы' },
+  { name:'Грановитая палата', city:'Москва', year:'1487–1491', ruler:'', author:'Марк Фрязин и Пьетро Солари', desc:'Тронный зал для приёма послов, парадный зал дворца' },
+  { name:'Спасская башня Московского Кремля', city:'Москва', year:'1491', ruler:'', author:'Пьетро Солари', desc:'Главная башня Кремля, парадный въезд' },
+  { name:'Теремной дворец', city:'Москва', year:'1635–1636', ruler:'', author:'Бажен Огурцов', desc:'Жилые покои царей, первый каменный жилой дворец' },
+  { name:'Церковь Вознесения в Коломенском', city:'Коломенское', year:'1532', ruler:'', author:'Петрок Малый', desc:'Первый шатровый храм на Руси, построен в честь рождения Ивана Грозного' },
+  { name:'Коломенский дворец Алексея Михайловича', city:'Коломенское', year:'1667–1672', ruler:'', author:'русские мастера', desc:'Деревянный дворец, «восьмое чудо света», символ богатства' },
+  { name:'Новодевичий монастырь', city:'Москва', year:'1524', ruler:'Василий III', author:'', desc:'Монастырь в честь взятия Смоленска, место заточения Софьи' },
+  { name:'Храм Василия Блаженного (Покрова на Рву)', city:'Москва', year:'1555–1561', ruler:'', author:'Барма и Постник', desc:'Храм в честь взятия Казани, символ победы' },
+  { name:'Казанский собор на Красной площади', city:'Москва', year:'1625–1636', ruler:'', author:'русские мастера', desc:'Храм в честь изгнания поляков, «князь-Дмитриевский»' },
+  { name:'Церковь Троицы в Никитниках', city:'Москва', year:'1634', ruler:'', author:'русские мастера', desc:'Приходской храм, узорочье, фрески' },
+  { name:'Воскресенский собор Новоиерусалимского монастыря', city:'Истра', year:'1658–1685', ruler:'патриарх Никон', author:'', desc:'Копия храма Гроба Господня в Иерусалиме' },
+  { name:'Храм Покрова в Филях', city:'Москва', year:'1690–1694', ruler:'Л. Нарышкин', author:'', desc:'Нарышкинское барокко, центрический храм' },
+  { name:'Сухарева башня', city:'Москва', year:'1692–1695', ruler:'Пётр I', author:'', desc:'Снесена в 1934 г., символ петровских реформ' },
+  { name:'Церковь Преображения Господня на острове Кижи', city:'Кижи', year:'1714', ruler:'', author:'русские мастера', desc:'Шедевр деревянного зодчества, 22-главая церковь без гвоздей' },
+  { name:'Храм Апостолов Петра и Павла', city:'Санкт-Петербург', year:'1703', ruler:'Пётр I', author:'', desc:'Первый храм Санкт-Петербурга, деревянный' },
+  { name:'Знаменская церковь в Дубровицах', city:'Дубровицы', year:'1690–1704', ruler:'Б. Голицын', author:'', desc:'Нарышкинское барокко, резной декор, скульптуры' },
+  { name:'Меншикова башня', city:'Москва', year:'1704–1707', ruler:'', author:'И. Зарудный', desc:'Нарышкинское барокко, храм Архангела Гавриила' },
+  { name:'Усадьба Царицыно', city:'Москва', year:'1776–1796', ruler:'', author:'Василий Баженов', desc:'Псевдоготика, загородная резиденция Екатерины II' },
+  { name:'Дом Пашкова', city:'Москва', year:'1784–1786', ruler:'', author:'Василий Баженов', desc:'Классицизм, одно из красивейших зданий Москвы' },
+  { name:'Сенатский дворец', city:'Москва', year:'1776–1787', ruler:'', author:'Матвей Казаков', desc:'Классицизм, здание Сената в Кремле, купол' },
+  { name:'ГУМ (Верхние Торговые ряды)', city:'Москва', year:'1890–1893', ruler:'', author:'Александр Померанцев', desc:'Крупнейший торговый комплекс Москвы' },
+  { name:'Политехнический музей', city:'Москва', year:'1872', ruler:'', author:'И. Монигетти', desc:'Первый музей прикладных знаний в Москве' },
+  { name:'Пушкинский музей', city:'Москва', year:'1898–1912', ruler:'', author:'Р. Клейн', desc:'Музей изящных искусств, классицизм' },
+  { name:'Гостиница «Метрополь»', city:'Москва', year:'1899–1905', ruler:'', author:'В. Валькот', desc:'Модерн, скульптуры, майолика' },
+  { name:'Ярославский вокзал', city:'Москва', year:'1902–1904', ruler:'', author:'Ф. Шехтель', desc:'Модерн, сказочный терем' },
+  { name:'Особняки Шехтеля', city:'Москва', year:'1890–1910-е', ruler:'', author:'Ф. Шехтель', desc:'Модерн, особняк Рябушинского' },
+  { name:'Петропавловский собор', city:'Санкт-Петербург', year:'1712–1733', ruler:'', author:'Доменико Трезини', desc:'Первый храм Петербурга, усыпальница императоров' },
+  { name:'Летний дворец Петра I', city:'Санкт-Петербург', year:'1710–1714', ruler:'', author:'Доменико Трезини', desc:'Первый жилой дом Петербурга' },
+  { name:'Меншиковский дворец', city:'Санкт-Петербург', year:'1710–1727', ruler:'', author:'Дж. Фонтана и Г. Шедель', desc:'Первое каменное здание Петербурга' },
+  { name:'Здание Двенадцати коллегий', city:'Санкт-Петербург', year:'1722–1742', ruler:'', author:'Доменико Трезини', desc:'Здание для коллегий, сейчас университет' },
+  { name:'Смольный собор', city:'Санкт-Петербург', year:'1748–1764', ruler:'', author:'Бартоломео Растрелли', desc:'Елизаветинское барокко, 5-главый собор' },
+  { name:'Зимний дворец', city:'Санкт-Петербург', year:'1754–1762', ruler:'', author:'Бартоломео Растрелли', desc:'Главная резиденция императоров, Эрмитаж' },
+  { name:'Большой Екатерининский дворец', city:'Царское Село', year:'1752–1756', ruler:'', author:'Бартоломео Растрелли', desc:'Резиденция в Царском Селе, Янтарная комната' },
+  { name:'Таврический дворец', city:'Санкт-Петербург', year:'1783–1789', ruler:'', author:'Иван Старов', desc:'Резиденция Потемкина, классицизм' },
+  { name:'Казанский собор в Санкт-Петербурге', city:'Санкт-Петербург', year:'1801–1811', ruler:'', author:'Андрей Воронихин', desc:'Ампир, усыпальница Кутузова' },
+  { name:'Манеж', city:'Москва', year:'1817–1825', ruler:'', author:'Осип Бове', desc:'Здание для верховой езды, ампир' },
+  { name:'Главное адмиралтейство', city:'Санкт-Петербург', year:'1704–1706', ruler:'Пётр I', author:'', desc:'Первая верфь Балтийского флота, перестроена Захаровым' },
+  { name:'Большой театр', city:'Москва', year:'1821–1824', ruler:'', author:'Осип Бове', desc:'Оперный театр, ампир' },
+  { name:'Арка Главного штаба', city:'Санкт-Петербург', year:'1819–1829', ruler:'', author:'Карл Росси', desc:'Триумфальная арка в честь победы 1812 г.' },
+  { name:'Исаакиевский собор', city:'Санкт-Петербург', year:'1818–1858', ruler:'', author:'Огюст Монферран', desc:'Поздний классицизм, крупнейший собор России' },
+  { name:'Храм Воскресения Христова на крови (Спас на крови)', city:'Санкт-Петербург', year:'1883–1907', ruler:'', author:'Альфред Парланд', desc:'Русский стиль, на месте убийства Александра II' },
+  { name:'Храм Христа Спасителя', city:'Москва', year:'1839–1883', ruler:'', author:'Константин Тон', desc:'Русско-византийский стиль, в честь победы 1812 г.' },
+  { name:'Мавзолей Ленина', city:'Москва', year:'1924–1930', ruler:'', author:'Алексей Щусев', desc:'Усыпальница, конструктивизм / сталинский ампир' },
+  { name:'Камеронова галерея в Царском Селе', city:'Царское Село', year:'1780-е', ruler:'', author:'Чарльз Камерон', desc:'Классицизм, прогулочная галерея' },
+  { name:'Интерьеры Екатерининского дворца', city:'Царское Село', year:'1750-е', ruler:'', author:'Бартоломео Растрелли', desc:'Барокко, роскошь' },
+  { name:'Адмиралтейство', city:'Санкт-Петербург', year:'1704', ruler:'Пётр I', author:'', desc:'Верфь, перестроена Захаровым в 1806–1823 гг., ампир' },
+  { name:'Большой Кремлёвский дворец', city:'Москва', year:'1838–1849', ruler:'', author:'Константин Тон', desc:'Императорская резиденция в Кремле' }
+];
+
+function isGenericAuthor(a) {
+  if (!a) return true;
+  const s = a.toLowerCase();
+  return s === 'русские мастера' || s === 'псковские мастера' || s === 'неизвестен' || s === '—';
+}
+function getCreatorFact(m) {
+  if (m.ruler) return { text: `Создан при ${m.ruler}`, kind:'ruler' };
+  if (m.author && !isGenericAuthor(m.author)) return { text: `Автор — ${m.author}`, kind:'author' };
+  return null;
+}
+function getCityFact(m) { return `Находится в ${m.city}`; }
+function getYearFact(m) { return `Создан в ${m.year}`; }
+function getDescFact(m) { return m.desc; }
+
+/* =========================================================
+   2. ПЕРСОНАЖИ
+   ========================================================= */
+const CHARACTERS = [
+  { name:'Рюрик', period:'Древняя Русь (862–1132)', action:'Призвание на княжение в Новгород (862)' },
+  { name:'Олег Вещий', period:'Древняя Русь (862–1132)', action:'Объединение Новгорода и Киева (882), походы на Византию' },
+  { name:'Игорь Рюрикович', period:'Древняя Русь (862–1132)', action:'Походы на Византию, гибель у древлян (945)' },
+  { name:'Княгиня Ольга', period:'Древняя Русь (862–1132)', action:'Реформа сбора дани (уроки и погосты), крещение' },
+  { name:'Святослав Игоревич', period:'Древняя Русь (862–1132)', action:'Разгром Хазарского каганата' },
+  { name:'Владимир Святой', period:'Древняя Русь (862–1132)', action:'Крещение Руси (988)' },
+  { name:'Ярослав Мудрый', period:'Древняя Русь (862–1132)', action:'Русская Правда, Софийский собор в Киеве' },
+  { name:'Владимир Мономах', period:'Древняя Русь (862–1132)', action:'Походы на половцев, «Поучение детям»' },
+  { name:'Юрий Долгорукий', period:'Удельная раздробленность и Орда (1132–1480)', action:'Первое упоминание Москвы в летописи (1147)' },
+  { name:'Андрей Боголюбский', period:'Удельная раздробленность и Орда (1132–1480)', action:'Успенский собор во Владимире, храм Покрова на Нерли' },
+  { name:'Всеволод Большое Гнездо', period:'Удельная раздробленность и Орда (1132–1480)', action:'Расцвет Владимиро-Суздальского княжества' },
+  { name:'Александр Невский', period:'Удельная раздробленность и Орда (1132–1480)', action:'Невская битва (1240), Ледовое побоище (1242)' },
+  { name:'Даниил Московский', period:'Удельная раздробленность и Орда (1132–1480)', action:'Присоединение Коломны и Переяславля-Залесского' },
+  { name:'Иван Калита', period:'Удельная раздробленность и Орда (1132–1480)', action:'Ярлык на великое княжение, перенос кафедры митрополита в Москву' },
+  { name:'Сергий Радонежский', period:'Удельная раздробленность и Орда (1132–1480)', action:'Основание Троицкого монастыря, благословение Дмитрия Донского' },
+  { name:'Дмитрий Донской', period:'Удельная раздробленность и Орда (1132–1480)', action:'Куликовская битва (1380), белокаменный Кремль' },
+  { name:'Василий II Тёмный', period:'Удельная раздробленность и Орда (1132–1480)', action:'Феодальная (междоусобная) война, ослепление' },
+  { name:'Иван III', period:'Московское государство (1480–1682)', action:'Стояние на Угре (1480), Судебник 1497, присоединение Новгорода' },
+  { name:'Василий III', period:'Московское государство (1480–1682)', action:'Присоединение Пскова, Рязани, Смоленска' },
+  { name:'Иван IV Грозный', period:'Московское государство (1480–1682)', action:'Реформы Избранной рады, опричнина, взятие Казани и Астрахани' },
+  { name:'Митрополит Макарий', period:'Московское государство (1480–1682)', action:'Венчание Ивана IV на царство, участник Избранной рады' },
+  { name:'Малюта Скуратов', period:'Московское государство (1480–1682)', action:'Опричный террор, убийство митрополита Филиппа' },
+  { name:'А.М. Курбский', period:'Московское государство (1480–1682)', action:'Воевода, бежал в Литву, переписка с Иваном Грозным' },
+  { name:'А.Ф. Адашев', period:'Московское государство (1480–1682)', action:'Глава Избранной рады, реформы 1550-х гг.' },
+  { name:'Ермак Тимофеевич', period:'Московское государство (1480–1682)', action:'Начало присоединения Сибири' },
+  { name:'Борис Годунов', period:'Московское государство (1480–1682)', action:'Учреждение патриаршества (1589), урочные лета' },
+  { name:'Василий Шуйский', period:'Московское государство (1480–1682)', action:'Царь в Смутное время, подавление восстания Болотникова' },
+  { name:'Кузьма Минин', period:'Московское государство (1480–1682)', action:'Организатор Второго ополчения, освобождение Москвы (1612)' },
+  { name:'Дмитрий Пожарский', period:'Московское государство (1480–1682)', action:'Военный руководитель Второго ополчения' },
+  { name:'Михаил Фёдорович', period:'Московское государство (1480–1682)', action:'Первый царь династии Романовых (1613)' },
+  { name:'Алексей Михайлович', period:'Московское государство (1480–1682)', action:'Соборное уложение 1649, воссоединение Украины с Россией' },
+  { name:'Патриарх Никон', period:'Московское государство (1480–1682)', action:'Церковная реформа, вызвавшая раскол' },
+  { name:'Протопоп Аввакум', period:'Московское государство (1480–1682)', action:'Лидер старообрядцев, противник реформы Никона' },
+  { name:'Степан Разин', period:'Московское государство (1480–1682)', action:'Восстание 1670–1671 гг.' },
+  { name:'Богдан Хмельницкий', period:'Московское государство (1480–1682)', action:'Переяславская рада (1654), присоединение Украины' },
+  { name:'Фёдор Алексеевич', period:'Московское государство (1480–1682)', action:'Отмена местничества (1682)' },
+  { name:'Ф.И. Мстиславский', period:'Московское государство (1480–1682)', action:'Глава Семибоярщины (1610–1612)' },
+  { name:'Пётр I', period:'Российская империя: становление (1682–1801)', action:'Северная война, основание Петербурга, реформы' },
+  { name:'А.Д. Меншиков', period:'Российская империя: становление (1682–1801)', action:'Сподвижник Петра I, первый губернатор Петербурга' },
+  { name:'Екатерина I', period:'Российская империя: становление (1682–1801)', action:'Правление после Петра I, Верховный тайный совет' },
+  { name:'Анна Иоанновна', period:'Российская империя: становление (1682–1801)', action:'Разрыв кондиций, бироновщина' },
+  { name:'Елизавета Петровна', period:'Российская империя: становление (1682–1801)', action:'Основание Московского университета (1755), Семилетняя война' },
+  { name:'Пётр III', period:'Российская империя: становление (1682–1801)', action:'Манифест о вольности дворянства (1762)' },
+  { name:'Екатерина II', period:'Российская империя: становление (1682–1801)', action:'Присоединение Крыма, Жалованные грамоты, Уложенная комиссия' },
+  { name:'Г.А. Потёмкин', period:'Российская империя: становление (1682–1801)', action:'Присоединение Крыма, основание Севастополя и Херсона' },
+  { name:'А.В. Суворов', period:'Российская империя: становление (1682–1801)', action:'Итальянский и Швейцарский походы, «Наука побеждать»' },
+  { name:'Ф.Ф. Ушаков', period:'Российская империя: становление (1682–1801)', action:'Средиземноморский поход, взятие Корфу' },
+  { name:'Е.И. Пугачёв', period:'Российская империя: становление (1682–1801)', action:'Крестьянская война 1773–1775 гг.' },
+  { name:'Павел I', period:'Российская империя: становление (1682–1801)', action:'Указ о трёхдневной барщине (1797), изменение престолонаследия' },
+  { name:'Александр I', period:'Российская империя: апогей и кризис (1801–1917)', action:'Отечественная война 1812 г., министерства, Священный союз' },
+  { name:'М.М. Сперанский', period:'Российская империя: апогей и кризис (1801–1917)', action:'План реформ, Свод законов, Государственный совет' },
+  { name:'А.А. Аракчеев', period:'Российская империя: апогей и кризис (1801–1917)', action:'Военные поселения' },
+  { name:'М.И. Кутузов', period:'Российская империя: апогей и кризис (1801–1917)', action:'Главнокомандующий в Отечественной войне 1812 г., Бородино' },
+  { name:'П.И. Багратион', period:'Российская империя: апогей и кризис (1801–1917)', action:'Командующий 2-й Западной армией, смертельно ранен при Бородино' },
+  { name:'М.Б. Барклай-де-Толли', period:'Российская империя: апогей и кризис (1801–1917)', action:'Военный министр, тактика отступления 1812 г.' },
+  { name:'Николай I', period:'Российская империя: апогей и кризис (1801–1917)', action:'Подавление декабристов, Крымская война, III отделение' },
+  { name:'Е.Ф. Канкрин', period:'Российская империя: апогей и кризис (1801–1917)', action:'Денежная реформа 1839–1843 гг. (серебряный рубль)' },
+  { name:'П.Д. Киселёв', period:'Российская империя: апогей и кризис (1801–1917)', action:'Реформа управления государственными крестьянами' },
+  { name:'А.Х. Бенкендорф', period:'Российская империя: апогей и кризис (1801–1917)', action:'Шеф III отделения' },
+  { name:'П.С. Нахимов', period:'Российская империя: апогей и кризис (1801–1917)', action:'Синопское сражение (1853), оборона Севастополя' },
+  { name:'Александр II', period:'Российская империя: апогей и кризис (1801–1917)', action:'Отмена крепостного права (1861), Великие реформы' },
+  { name:'Н.А. Милютин', period:'Российская империя: апогей и кризис (1801–1917)', action:'Разработчик Крестьянской реформы 1861 г.' },
+  { name:'Д.А. Милютин', period:'Российская империя: апогей и кризис (1801–1917)', action:'Военная реформа, всеобщая воинская повинность (1874)' },
+  { name:'А.М. Горчаков', period:'Российская империя: апогей и кризис (1801–1917)', action:'Министр иностранных дел, отмена ограничений Парижского мира' },
+  { name:'М.Д. Скобелев', period:'Российская империя: апогей и кризис (1801–1917)', action:'Русско-турецкая война 1877–1878 гг. (Плевна)' },
+  { name:'Александр III', period:'Российская империя: апогей и кризис (1801–1917)', action:'Контрреформы, Манифест о незыблемости самодержавия' },
+  { name:'Н.Х. Бунге', period:'Российская империя: апогей и кризис (1801–1917)', action:'Отмена подушной подати, Крестьянский банк' },
+  { name:'С.Ю. Витте', period:'Российская империя: апогей и кризис (1801–1917)', action:'Денежная реформа (золотой рубль), Манифест 17 октября 1905 г.' },
+  { name:'Николай II', period:'Российская империя: апогей и кризис (1801–1917)', action:'Отречение 1917, Русско-японская война, Первая мировая' },
+  { name:'П.А. Столыпин', period:'Российская империя: апогей и кризис (1801–1917)', action:'Аграрная реформа, разрушение общины' },
+  { name:'П.И. Пестель', period:'Российская империя: апогей и кризис (1801–1917)', action:'Автор «Русской правды», Южное общество декабристов' },
+  { name:'К.Ф. Рылеев', period:'Российская империя: апогей и кризис (1801–1917)', action:'Один из лидеров Северного общества, восстание 14 декабря' },
+  { name:'А.А. Брусилов', period:'Российская империя: апогей и кризис (1801–1917)', action:'Брусиловский прорыв (1916)' },
+  { name:'Г.В. Плеханов', period:'Российская империя: апогей и кризис (1801–1917)', action:'Первый русский марксист, группа «Освобождение труда»' },
+  { name:'В.И. Ленин', period:'Революция и Гражданская война (1917–1922)', action:'Октябрьская революция, председатель Совнаркома' },
+  { name:'Л.Д. Троцкий', period:'Революция и Гражданская война (1917–1922)', action:'Создатель Красной Армии, председатель Реввоенсовета' },
+  { name:'А.Ф. Керенский', period:'Революция и Гражданская война (1917–1922)', action:'Глава Временного правительства' },
+  { name:'А.В. Колчак', period:'Революция и Гражданская война (1917–1922)', action:'Верховный правитель России, Белое движение на Востоке' },
+  { name:'А.И. Деникин', period:'Революция и Гражданская война (1917–1922)', action:'Командующий ВСЮР, наступление на Москву' },
+  { name:'П.Н. Врангель', period:'Революция и Гражданская война (1917–1922)', action:'Белый лидер в Крыму, эвакуация 1920 г.' },
+  { name:'Л.Г. Корнилов', period:'Революция и Гражданская война (1917–1922)', action:'Создатель Добровольческой армии' },
+  { name:'Н.Н. Юденич', period:'Революция и Гражданская война (1917–1922)', action:'Наступление на Петроград (1919)' },
+  { name:'М.В. Фрунзе', period:'Революция и Гражданская война (1917–1922)', action:'Штурм Перекопа, разгром Врангеля в Крыму' },
+  { name:'И.В. Сталин', period:'СССР: становление и апогей (1922–1953)', action:'Индустриализация, коллективизация, Великая Отечественная' },
+  { name:'Л.П. Берия', period:'СССР: становление и апогей (1922–1953)', action:'Нарком внутренних дел, куратор атомного проекта' },
+  { name:'Г.К. Жуков', period:'СССР: становление и апогей (1922–1953)', action:'Битва за Москву, Сталинград, взятие Берлина' },
+  { name:'К.К. Рокоссовский', period:'СССР: становление и апогей (1922–1953)', action:'Операция «Багратион», командовал Парадом Победы' },
+  { name:'И.С. Конев', period:'СССР: становление и апогей (1922–1953)', action:'Берлинская операция, освобождение Праги' },
+  { name:'А.М. Василевский', period:'СССР: становление и апогей (1922–1953)', action:'Начальник Генштаба, главный стратег войны' },
+  { name:'К.Е. Ворошилов', period:'СССР: становление и апогей (1922–1953)', action:'Нарком обороны, один из первых маршалов' },
+  { name:'С.М. Будённый', period:'СССР: становление и апогей (1922–1953)', action:'Командир 1-й Конной армии' },
+  { name:'С.К. Тимошенко', period:'СССР: становление и апогей (1922–1953)', action:'Нарком обороны 1940–1941 гг.' },
+  { name:'М.Н. Тухачевский', period:'СССР: становление и апогей (1922–1953)', action:'Военный теоретик, репрессирован в 1937 г.' },
+  { name:'Н.Ф. Ватутин', period:'СССР: становление и апогей (1922–1953)', action:'Битва за Днепр, Курская битва' },
+  { name:'В.И. Чуйков', period:'СССР: становление и апогей (1922–1953)', action:'Оборона Сталинграда (62-я армия)' },
+  { name:'Л.А. Говоров', period:'СССР: становление и апогей (1922–1953)', action:'Прорыв и снятие блокады Ленинграда' },
+  { name:'Р.Я. Малиновский', period:'СССР: становление и апогей (1922–1953)', action:'Ясско-Кишинёвская операция, министр обороны СССР' },
+  { name:'И.Д. Черняховский', period:'СССР: становление и апогей (1922–1953)', action:'Самый молодой командующий фронтом' },
+  { name:'А.А. Жданов', period:'СССР: становление и апогей (1922–1953)', action:'Идеолог, разгром журналов «Звезда» и «Ленинград»' },
+  { name:'В.М. Молотов', period:'СССР: становление и апогей (1922–1953)', action:'Пакт Молотова-Риббентропа (1939)' },
+  { name:'Н.А. Вознесенский', period:'СССР: становление и апогей (1922–1953)', action:'Председатель Госплана, репрессирован по «ленинградскому делу»' },
+  { name:'А.А. Кузнецов', period:'СССР: становление и апогей (1922–1953)', action:'Первый секретарь Ленинградского обкома, репрессирован' },
+  { name:'Г.М. Маленков', period:'СССР: становление и апогей (1922–1953)', action:'Председатель Совмина после Сталина' },
+  { name:'Н.С. Хрущёв', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Разоблачение культа личности, целина, космос' },
+  { name:'Л.И. Брежнев', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Застой, разрядка, ввод войск в Афганистан' },
+  { name:'Ю.В. Андропов', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Генсек 1982–1984 гг., борьба с коррупцией' },
+  { name:'М.С. Горбачёв', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Перестройка, гласность, распад СССР' },
+  { name:'А.А. Громыко', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Министр иностранных дел 1957–1985 гг.' },
+  { name:'Д.Ф. Устинов', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Министр обороны, ввод войск в Афганистан' },
+  { name:'М.А. Суслов', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Главный идеолог КПСС, «серый кардинал»' },
+  { name:'А.Д. Сахаров', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Физик, правозащитник, Нобелевская премия мира' },
+  { name:'С.П. Королёв', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Главный конструктор, первый спутник и полёт Гагарина' },
+  { name:'Ю.А. Гагарин', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Первый человек в космосе (12 апреля 1961 г.)' },
+  { name:'Д.Т. Язов', period:'СССР: оттепель, застой, перестройка (1953–1991)', action:'Последний маршал СССР, член ГКЧП' },
+  { name:'Б.Н. Ельцин', period:'Постсоветская Россия (1991 – н.в.)', action:'Первый президент РФ, шоковая терапия, ГКЧП' },
+  { name:'Е.Т. Гайдар', period:'Постсоветская Россия (1991 – н.в.)', action:'Либерализация цен, «шоковая терапия»' },
+  { name:'В.С. Черномырдин', period:'Постсоветская Россия (1991 – н.в.)', action:'Председатель Правительства РФ (1992–1998)' },
+  { name:'Е.М. Примаков', period:'Постсоветская Россия (1991 – н.в.)', action:'Председатель Правительства, разворот самолёта над Атлантикой' },
+  { name:'В.В. Путин', period:'Постсоветская Россия (1991 – н.в.)', action:'Президент РФ с 2000 г.' },
+  { name:'С.В. Кириенко', period:'Постсоветская Россия (1991 – н.в.)', action:'Дефолт 1998 года' },
+  { name:'П.С. Грачёв', period:'Постсоветская Россия (1991 – н.в.)', action:'Первый министр обороны РФ' }
+];
+
+/* =========================================================
+   3. ДАТЫ — ИСТОРИЯ РОССИИ (не трогаем)
+   ========================================================= */
+const RUSSIAN_DATES = [
+  { date:'862–879', event:'Правление Рюрика', period:'Древняя Русь (862–1132)' },
+  { date:'879–912', event:'Правление Олега', period:'Древняя Русь (862–1132)' },
+  { date:'882', event:'Убийство Аскольда и Дира, объединение Новгорода и Киева', period:'Древняя Русь (862–1132)' },
+  { date:'907, 911', event:'Походы Олега на Византию, заключение договоров', period:'Древняя Русь (862–1132)' },
+  { date:'912–945', event:'Правление Игоря', period:'Древняя Русь (862–1132)' },
+  { date:'941–944', event:'Походы Игоря на Византию', period:'Древняя Русь (862–1132)' },
+  { date:'945', event:'Поход Игоря на древлян и его гибель', period:'Древняя Русь (862–1132)' },
+  { date:'945–957', event:'Правление Ольги', period:'Древняя Русь (862–1132)' },
+  { date:'957–972', event:'Правление Святослава', period:'Древняя Русь (862–1132)' },
+  { date:'964–969', event:'Восточный поход Святослава (разгром Хазарского каганата)', period:'Древняя Русь (862–1132)' },
+  { date:'970–971', event:'Поход Святослава на Византию', period:'Древняя Русь (862–1132)' },
+  { date:'980–1015', event:'Правление Владимира Святого', period:'Древняя Русь (862–1132)' },
+  { date:'988', event:'Крещение Руси', period:'Древняя Русь (862–1132)' },
+  { date:'X–XI вв.', event:'Активное распространение грамотности и книжности', period:'Древняя Русь (862–1132)' },
+  { date:'1019–1054', event:'Правление Ярослава Мудрого', period:'Древняя Русь (862–1132)' },
+  { date:'конец XI в.', event:'Начало летописания', period:'Древняя Русь (862–1132)' },
+  { date:'1016', event:'«Русская Правда» (краткая редакция)', period:'Древняя Русь (862–1132)' },
+  { date:'1024', event:'Лиственская битва', period:'Древняя Русь (862–1132)' },
+  { date:'1036', event:'Разгром печенегов; начало строительства Софийского собора в Киеве', period:'Древняя Русь (862–1132)' },
+  { date:'1072', event:'«Правда Ярославичей»', period:'Древняя Русь (862–1132)' },
+  { date:'1068', event:'Поражение на реке Альте', period:'Древняя Русь (862–1132)' },
+  { date:'1097', event:'Любечский съезд князей', period:'Древняя Русь (862–1132)' },
+  { date:'XI в.', event:'Остромирово Евангелие (дьякон Григорий)', period:'Древняя Русь (862–1132)' },
+  { date:'1113–1125', event:'Правление Владимира Мономаха', period:'Древняя Русь (862–1132)' },
+  { date:'1113', event:'Первая редакция «Повести временных лет»', period:'Древняя Русь (862–1132)' },
+  { date:'1125–1132', event:'Правление Мстислава Великого', period:'Древняя Русь (862–1132)' },
+  { date:'1125–1157', event:'Правление Юрия Долгорукого', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1147', event:'Первое упоминание Москвы в летописи', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1157–1174', event:'Правление Андрея Боголюбского', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1176–1212', event:'Правление Всеволода Большое Гнездо', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1185', event:'Поход Игоря Святославича на половцев', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1212–1246', event:'Правление Юрия Всеволодовича и Ярослава Всеволодовича', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1223', event:'Битва на реке Калке', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1237–1238', event:'Разгром Владимиро-Суздальского княжества', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1238', event:'Битва на реке Сити', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1240–1241', event:'Разгром Киева и Юго-Западной Руси', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1236–1263', event:'Правление Александра Невского', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1240', event:'Невская битва', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1242', event:'Ледовое побоище (Чудская битва)', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1245', event:'Битва с литовцами', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1252', event:'Неврюева рать', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1261–1303', event:'Правление Даниила Московского', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1301', event:'Присоединение Коломны', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1302', event:'Присоединение Переяславля-Залесского', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1303', event:'Присоединение Можайска', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1303–1325', event:'Правление Юрия Даниловича', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1325–1340', event:'Правление Ивана Калиты I', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1327', event:'Антиордынское восстание в Твери', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1325', event:'Перенос кафедры митрополита Петра в Москву', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1340–1369', event:'Правление Симеона Гордого и Ивана Красного II', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1369–1389', event:'Правление Дмитрия Донского', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1377', event:'Битва на реке Пьяне', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1378', event:'Битва на реке Воже', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1380', event:'Куликовская битва', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1368–1372', event:'Противостояние с Ольгердом', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1382', event:'Нашествие Тохтамыша', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1389–1425', event:'Правление Василия I', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1395', event:'Поход Тимура (Тамерлана)', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'XIV–нач. XV в.', event:'Творчество Феофана Грека', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1408', event:'Нашествие Едигея', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1425–1462', event:'Правление Василия II', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1425–1453', event:'Феодальная (междоусобная) война', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1448', event:'Автокефалия русской церкви', period:'Удельная раздробленность и Орда (1132–1480)' },
+  { date:'1462–1505', event:'Правление Ивана III Великого', period:'Московское государство (1480–1598)' },
+  { date:'1471', event:'Битва на реке Шелони', period:'Московское государство (1480–1598)' },
+  { date:'1478', event:'Присоединение Новгорода', period:'Московское государство (1480–1598)' },
+  { date:'1485', event:'Присоединение Твери', period:'Московское государство (1480–1598)' },
+  { date:'1480', event:'Стояние на реке Угре', period:'Московское государство (1480–1598)' },
+  { date:'1500–1503', event:'Русско-литовская война', period:'Московское государство (1480–1598)' },
+  { date:'1497', event:'Судебник Ивана III', period:'Московское государство (1480–1598)' },
+  { date:'конец XV–нач. XVI в.', event:'Противостояние нестяжателей и иосифлян', period:'Московское государство (1480–1598)' },
+  { date:'XV в.', event:'Творчество Андрея Рублёва и Дионисия; Московский летописный свод (1479)', period:'Московское государство (1480–1598)' },
+  { date:'1505–1533', event:'Правление Василия III', period:'Московское государство (1480–1598)' },
+  { date:'1510', event:'Присоединение Пскова', period:'Московское государство (1480–1598)' },
+  { date:'1521', event:'Присоединение Рязани', period:'Московское государство (1480–1598)' },
+  { date:'1514', event:'Присоединение Смоленска', period:'Московское государство (1480–1598)' },
+  { date:'1533–1584', event:'Правление Ивана Грозного', period:'Московское государство (1480–1598)' },
+  { date:'1549', event:'Первый Земский собор', period:'Московское государство (1480–1598)' },
+  { date:'1549–1560', event:'Реформы Избранной Рады', period:'Московское государство (1480–1598)' },
+  { date:'1551', event:'Стоглавый собор', period:'Московское государство (1480–1598)' },
+  { date:'1565–1572', event:'Опричнина', period:'Московское государство (1480–1598)' },
+  { date:'1558–1583', event:'Ливонская война', period:'Московское государство (1480–1598)' },
+  { date:'1582/3', event:'Ям-Запольский мир и Плюсское перемирие', period:'Московское государство (1480–1598)' },
+  { date:'1552', event:'Взятие Казани', period:'Московское государство (1480–1598)' },
+  { date:'1556', event:'Взятие Астрахани', period:'Московское государство (1480–1598)' },
+  { date:'1580-е', event:'Походы Ермака и присоединение Сибири', period:'Московское государство (1480–1598)' },
+  { date:'1581', event:'«Заповедные лета» (запрет перехода в Юрьев день)', period:'Московское государство (1480–1598)' },
+  { date:'1572', event:'Битва при Молодях', period:'Московское государство (1480–1598)' },
+  { date:'1584–1598', event:'Правление Фёдора Ивановича', period:'Московское государство (1480–1598)' },
+  { date:'1589', event:'Учреждение патриаршества', period:'Московское государство (1480–1598)' },
+  { date:'1597', event:'«Урочные лета» (срок сыска беглых крестьян)', period:'Московское государство (1480–1598)' },
+  { date:'1591', event:'Смерть царевича Дмитрия в Угличе', period:'Московское государство (1480–1598)' },
+  { date:'1586', event:'Основание Тюмени и Воронежа', period:'Московское государство (1480–1598)' },
+  { date:'1587', event:'Основание Тобольска', period:'Московское государство (1480–1598)' },
+  { date:'1598–1605', event:'Правление Бориса Годунова', period:'Смутное время (1598–1618)' },
+  { date:'1601–1603', event:'Голод в России (неудачные действия властей)', period:'Смутное время (1598–1618)' },
+  { date:'1598', event:'Земский собор, избравший Бориса Годунова на царство', period:'Смутное время (1598–1618)' },
+  { date:'1603', event:'Восстание Хлопка Косолапа', period:'Смутное время (1598–1618)' },
+  { date:'1604', event:'Поход Лжедмитрия I на Москву', period:'Смутное время (1598–1618)' },
+  { date:'1605–1606', event:'Правление Лжедмитрия I', period:'Смутное время (1598–1618)' },
+  { date:'1606–1607', event:'Восстание Ивана Болотникова', period:'Смутное время (1598–1618)' },
+  { date:'1606–1610', event:'Правление Василия Шуйского', period:'Смутное время (1598–1618)' },
+  { date:'1607–1610', event:'Тушинский вор — Лжедмитрий II', period:'Смутное время (1598–1618)' },
+  { date:'1610–1612', event:'Семибоярщина', period:'Смутное время (1598–1618)' },
+  { date:'1611', event:'Первое ополчение (Ляпунов, Заруцкий, Трубецкой)', period:'Смутное время (1598–1618)' },
+  { date:'1611–1612', event:'Второе ополчение (Минин и Пожарский)', period:'Смутное время (1598–1618)' },
+  { date:'24 июня 1610', event:'Битва под Клушино', period:'Смутное время (1598–1618)' },
+  { date:'1609', event:'Начало польской интервенции', period:'Смутное время (1598–1618)' },
+  { date:'1613', event:'Земский собор, избравший Михаила Фёдоровича Романова', period:'Смутное время (1598–1618)' },
+  { date:'1617', event:'Столбовский мир со Швецией', period:'Смутное время (1598–1618)' },
+  { date:'1618', event:'Деулинское перемирие с Речью Посполитой', period:'Смутное время (1598–1618)' },
+  { date:'1613–1645', event:'Правление Михаила Фёдоровича Романова', period:'Бунташный век (1618–1682)' },
+  { date:'1632–1634', event:'Смоленская война', period:'Бунташный век (1618–1682)' },
+  { date:'1634', event:'Поляновский мир; создание полков нового строя', period:'Бунташный век (1618–1682)' },
+  { date:'1645–1676', event:'Правление Алексея Михайловича Тишайшего', period:'Бунташный век (1618–1682)' },
+  { date:'1648', event:'Соляной бунт; ссылка Морозова', period:'Бунташный век (1618–1682)' },
+  { date:'1662', event:'Медный бунт', period:'Бунташный век (1618–1682)' },
+  { date:'1650', event:'Хлебные бунты', period:'Бунташный век (1618–1682)' },
+  { date:'1670–1671', event:'Восстание Степана Разина (осада Симбирска)', period:'Бунташный век (1618–1682)' },
+  { date:'1654–1667', event:'Русско-польская война', period:'Бунташный век (1618–1682)' },
+  { date:'1653', event:'Последний Земский собор (по вопросу Украины)', period:'Бунташный век (1618–1682)' },
+  { date:'1654', event:'Переяславская рада', period:'Бунташный век (1618–1682)' },
+  { date:'1656–1658', event:'Русско-шведская война', period:'Бунташный век (1618–1682)' },
+  { date:'1658', event:'Валиесарское перемирие', period:'Бунташный век (1618–1682)' },
+  { date:'1667', event:'Новоторговый устав', period:'Бунташный век (1618–1682)' },
+  { date:'1667', event:'Андрусовское перемирие', period:'Бунташный век (1618–1682)' },
+  { date:'1649', event:'Соборное уложение', period:'Бунташный век (1618–1682)' },
+  { date:'1654', event:'Церковные реформы Никона', period:'Бунташный век (1618–1682)' },
+  { date:'1668–1676', event:'Соловецкое восстание', period:'Бунташный век (1618–1682)' },
+  { date:'1649–1653', event:'Походы Ерофея Хабарова', period:'Бунташный век (1618–1682)' },
+  { date:'1643–1660', event:'Походы Семёна Дежнёва', period:'Бунташный век (1618–1682)' },
+  { date:'1676–1682', event:'Правление Фёдора Алексеевича', period:'Бунташный век (1618–1682)' },
+  { date:'1682', event:'Отмена местничества', period:'Бунташный век (1618–1682)' },
+  { date:'1677–1681', event:'Русско-турецкая война, Чигиринские походы', period:'Бунташный век (1618–1682)' },
+  { date:'1681', event:'Бахчисарайский мир', period:'Бунташный век (1618–1682)' },
+  { date:'1679', event:'Замена посошной подати подворной', period:'Бунташный век (1618–1682)' },
+  { date:'1682', event:'Стрелецкий бунт (Софья, Иван и Пётр)', period:'Становление империей (1682–1725)' },
+  { date:'1682–1725', event:'Правление Петра I', period:'Становление империей (1682–1725)' },
+  { date:'1686', event:'Вечный мир с Польшей', period:'Становление империей (1682–1725)' },
+  { date:'1689', event:'Нерчинский договор с Китаем', period:'Становление империей (1682–1725)' },
+  { date:'1687, 1689', event:'Крымские походы В.В. Голицына', period:'Становление империей (1682–1725)' },
+  { date:'1689', event:'Установление власти Петра I', period:'Становление империей (1682–1725)' },
+  { date:'1696', event:'Смерть Ивана V', period:'Становление империей (1682–1725)' },
+  { date:'1695, 1696', event:'Азовские походы', period:'Становление империей (1682–1725)' },
+  { date:'1697–1698', event:'Великое посольство', period:'Становление империей (1682–1725)' },
+  { date:'1699', event:'Введение нового летоисчисления', period:'Становление империей (1682–1725)' },
+  { date:'1699–1705', event:'Введение рекрутской повинности', period:'Становление империей (1682–1725)' },
+  { date:'1703', event:'Основание Санкт-Петербурга', period:'Становление империей (1682–1725)' },
+  { date:'1700–1721', event:'Северная война', period:'Становление империей (1682–1725)' },
+  { date:'1700', event:'Поражение под Нарвой', period:'Становление империей (1682–1725)' },
+  { date:'1702', event:'Взятие крепости Нотебург (Орешек)', period:'Становление империей (1682–1725)' },
+  { date:'1710', event:'Взятие Ревеля, Риги и Нарвы', period:'Становление империей (1682–1725)' },
+  { date:'1711', event:'Создание Сената (вместо Боярской думы)', period:'Становление империей (1682–1725)' },
+  { date:'1711', event:'Прутский поход', period:'Становление империей (1682–1725)' },
+  { date:'1708', event:'Битва у деревни Лесная', period:'Становление империей (1682–1725)' },
+  { date:'1709', event:'Полтавская битва', period:'Становление империей (1682–1725)' },
+  { date:'1714', event:'Создание Кунсткамеры', period:'Становление империей (1682–1725)' },
+  { date:'1718–1721', event:'Создание коллегий (вместо приказов)', period:'Становление империей (1682–1725)' },
+  { date:'1724', event:'Введение подушной подати', period:'Становление империей (1682–1725)' },
+  { date:'1722', event:'Создание Табели о рангах', period:'Становление империей (1682–1725)' },
+  { date:'1722', event:'Указ о престолонаследии', period:'Становление империей (1682–1725)' },
+  { date:'1724', event:'Указ о создании Академии наук', period:'Становление империей (1682–1725)' },
+  { date:'1708–1710', event:'Губернская реформа', period:'Становление империей (1682–1725)' },
+  { date:'1721', event:'Создание Синода', period:'Становление империей (1682–1725)' },
+  { date:'1714', event:'Гангутская битва (первая победа русского флота)', period:'Становление империей (1682–1725)' },
+  { date:'1721', event:'Битва у острова Гренгам', period:'Становление империей (1682–1725)' },
+  { date:'1721', event:'Ништадтский мир', period:'Становление империей (1682–1725)' },
+  { date:'1722–1723', event:'Персидский поход', period:'Становление империей (1682–1725)' },
+  { date:'1723', event:'Петербургский мир (южное побережье Каспия)', period:'Становление империей (1682–1725)' },
+  { date:'1725–1727', event:'Правление Екатерины I', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1726', event:'Создание Верховного тайного совета (А. Меншиков)', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1727', event:'Свержение Меншикова и перенос столицы в Москву', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1727–1730', event:'Правление Петра II', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1730–1740', event:'Правление Анны Иоанновны', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1730', event:'Разрыв кондиций', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1730', event:'Роспуск Верховного тайного совета', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1731', event:'Отмена указа о единонаследии; создание Кабинета министров', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1731', event:'Создание Шляхетского корпуса', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1736', event:'Ограничение срока службы 25 годами', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1735–1739', event:'Русско-турецкая война', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1737', event:'Взятие Очакова', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1739', event:'Белградский мир', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1740–1741', event:'Правление Ивана VI', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1741–1761', event:'Правление Елизаветы Петровны', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1754', event:'Отмена внутренних таможенных пошлин', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1755', event:'Основание Московского университета', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1756–1763', event:'Семилетняя война', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1757', event:'Победа при Гросс-Егерсдорфе', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1759', event:'Победа при Кунерсдорфе', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1762', event:'Петербургский сепаратный мир с Пруссией', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1761–1762', event:'Правление Петра III', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1762', event:'Манифест о вольности дворянства', period:'Дворцовые перевороты (1725–1762)' },
+  { date:'1762–1796', event:'Правление Екатерины II', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1763', event:'Реформа Сената', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1764', event:'Секуляризация церковных земель', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1767–1768', event:'Уложенная комиссия', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1773–1775', event:'Восстание Емельяна Пугачёва', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1775', event:'Губернская реформа', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1775', event:'Упразднение Запорожской Сечи', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1785', event:'Жалованные грамоты дворянству и городам', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1782', event:'Устав благочиния (Полицейский устав)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1771', event:'Чумной бунт в Москве', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1768–1774', event:'Русско-турецкая война (первая при Екатерине II)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1770', event:'Чесменское сражение', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1772', event:'Первый раздел Речи Посполитой', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1783', event:'Георгиевский трактат (присоединение Крыма и Восточной Грузии)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1787–1791', event:'Русско-турецкая война (вторая при Екатерине II)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1791', event:'Ясский мир', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1788–1790', event:'Русско-шведская война при Екатерине II', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1790', event:'Верельский мир', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1796–1801', event:'Правление Павла I', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1797', event:'Изменение престолонаследия Павлом I; Манифест о трёхдневной барщине', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1797–1801', event:'Участие России во второй антифранцузской коалиции', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1799', event:'Итальянский и Швейцарский походы Суворова', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'12 января 1801', event:'Указ о походе казаков в Индию', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1801–1825', event:'Правление Александра I', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1802', event:'Создание министерств', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1803', event:'Указ о вольных хлебопашцах', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1801–1803', event:'Негласный комитет (Строганов, Кочубей, Новосильцев, Чарторыйский)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1803–1806', event:'Первая русская кругосветка Крузенштерна и Лисянского', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1810', event:'Создание Государственного совета', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1816', event:'Начало создания военных поселений Аракчеева', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1821–1822', event:'Создание Северного и Южного обществ декабристов', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1804–1813', event:'Русско-иранская война', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1813', event:'Гюлистанский мир', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1806–1812', event:'Русско-турецкая война', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1812', event:'Бухарестский мир (присоединение Бессарабии)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1808–1809', event:'Русско-шведская война (присоединение Финляндии)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1805', event:'Аустерлицкое сражение', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1807', event:'Тильзитский мир (континентальная блокада Англии)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'12 июня – 25 декабря 1812', event:'Отечественная война', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1813', event:'«Битва народов» под Лейпцигом', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1814', event:'Взятие Парижа', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1814–1815', event:'Венский конгресс', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1815', event:'Создание Священного союза (Австрия, Россия, Пруссия)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  { date:'1825–1855', event:'Правление Николая I', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'14 декабря 1825', event:'Восстание декабристов', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1826', event:'«Чугунный» цензурный устав; создание Третьего отделения', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1830–1831', event:'Восстание в Царстве Польском', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1837–1841', event:'Крестьянская реформа П.Д. Киселёва', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1842', event:'Указ «Об обязанных крестьянах»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1839–1843', event:'Финансовая реформа Е.Ф. Канкрина', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1826–1828', event:'Русско-персидская война', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1828', event:'Туркманчайский мир', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1828–1829', event:'Русско-турецкая война', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1829', event:'Адрианопольский мир', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1837', event:'Открытие первой железной дороги в России', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1851', event:'Открытие железной дороги между Петербургом и Москвой', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1853–1856', event:'Крымская война', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1853', event:'Синопское сражение (П.С. Нахимов)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'сентябрь 1854 – август 1855', event:'Оборона Севастополя', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1855–1881', event:'Правление Александра II', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1856', event:'Парижский мир (нейтралитет Чёрного моря)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1860', event:'Создание Государственного банка', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'19 февраля 1861', event:'Отмена крепостного права', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1864', event:'Земская реформа', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1864', event:'Судебная реформа (состязательность, гласность, суд присяжных)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1863', event:'Университетский устав', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1870', event:'Реформа городского управления', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1874', event:'Военная реформа (всеобщая воинская повинность)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1867', event:'Продажа Аляски США', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1819–1864', event:'Завершение Кавказской войны (пленение Шамиля)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1877–1878', event:'Русско-турецкая война (осада Плевны, штурм Карса)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1878', event:'Сан-Стефанский мир; Берлинский конгресс', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1881–1894', event:'Правление Александра III', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'29 апреля 1881', event:'Манифест «О незыблемости самодержавия»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1882', event:'«Временные правила печати»; Крестьянский поземельный банк', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1884', event:'Новый университетский устав', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1885', event:'Создание Дворянского земельного банка', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1886', event:'Отмена подушной подати', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1887', event:'Циркуляр «о кухаркиных детях»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1890', event:'Реформа земства и городского самоуправления', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1891', event:'Начало строительства Транссибирской магистрали', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1894–1917', event:'Правление Николая II', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1897', event:'Денежная реформа С.Ю. Витте', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1906', event:'Начало реформ Столыпина', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1899', event:'Гаагская конференция по разоружению', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1904–1905', event:'Русско-японская война', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'23 августа 1905', event:'Портсмутский мир (потеря Южного Сахалина, Порт-Артура, части КВЖД)', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'3 января 1905', event:'Забастовка на Путиловском заводе', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'9 января 1905', event:'«Кровавое воскресенье»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'июнь 1905', event:'Восстание на броненосце «Князь Потёмкин-Таврический»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'6 августа 1905', event:'«Булыгинская дума»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'17 октября 1905', event:'Манифест «Об усовершенствовании государственного порядка»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1906', event:'Работа I Государственной думы', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1907', event:'Работа II Государственной думы', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'3 июня 1907', event:'Роспуск Думы, «третьеиюньский переворот»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
+  { date:'1914', event:'Вступление России в Первую мировую войну', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'1915', event:'Николай II принял звание Верховного главнокомандующего', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'сентябрь 1914', event:'Восточно-Прусская операция', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'май – 7 сентября 1916', event:'Брусиловский прорыв', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'23 февраля (8 марта) 1917', event:'Начало массовых демонстраций в Петрограде', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'27 февраля (12 марта) 1917', event:'Вооружённое восстание; создание Временного комитета Госдумы и Петросовета', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'1 марта 1917', event:'Издание Приказа № 1 Петроградским Советом', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'2 марта 1917', event:'Отречение Николая II от престола', period:'Первая мировая и крушение империи (1914–1917)' },
+  { date:'3 марта 1917', event:'Отказ Михаила Александровича от власти до решения Учредительного собрания', period:'Первая мировая и крушение империи (1914–1917)' }
+];
+
+/* =========================================================
+   4. ДАТЫ — ВСЕОБЩАЯ ИСТОРИЯ (расширено)
+   ========================================================= */
+const WORLD_DATES = [
+  // Раннее Средневековье
+  { date:'476', event:'Падение Западной Римской империи', period:'Раннее Средневековье (V–XI века)' },
+  { date:'486', event:'Возникновение государства франков', period:'Раннее Средневековье (V–XI века)' },
+  { date:'527–565', event:'Правление Юстиниана I в Византийской империи', period:'Раннее Средневековье (V–XI века)' },
+  { date:'610', event:'Возникновение ислама', period:'Раннее Средневековье (V–XI века)' },
+  { date:'800', event:'Карл Великий — император', period:'Раннее Средневековье (V–XI века)' },
+  { date:'843', event:'Распад Франкской империи', period:'Раннее Средневековье (V–XI века)' },
+  { date:'962', event:'Образование Священной Римской империи', period:'Раннее Средневековье (V–XI века)' },
+  { date:'1054', event:'Разделение христианской церкви', period:'Раннее Средневековье (V–XI века)' },
+  { date:'1066', event:'Битва при Гастингсе, Нормандское завоевание Англии', period:'Раннее Средневековье (V–XI века)' },
+
+  // Зрелое Средневековье
+  { date:'1096–1270', event:'Крестовые походы', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1204', event:'Захват Константинополя крестоносцами', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1215', event:'Принятие Великой хартии вольности', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1265', event:'Возникновение Английского парламента', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1302', event:'Созыв Генеральных штатов во Франции', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1337–1453', event:'Столетняя война', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1358', event:'Жакерия во Франции', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1381', event:'Восстание У. Тайлера', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1389', event:'Битва на Косовом поле', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1419–1434', event:'Гуситские войны', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1445', event:'Изобретение книгопечатания Гуттенбергом', period:'Зрелое Средневековье (XI–XV века)' },
+  { date:'1453', event:'Падение Византийской империи', period:'Зрелое Средневековье (XI–XV века)' },
+
+  // Позднее Средневековье
+  { date:'1455–1485', event:'Война Алой и Белой розы в Англии', period:'Позднее Средневековье (XV век)' },
+  { date:'1461–1483', event:'Правление Людовика XI во Франции', period:'Позднее Средневековье (XV век)' },
+  { date:'1485–1509', event:'Правление Генриха VII в Англии', period:'Позднее Средневековье (XV век)' },
+  { date:'1492', event:'Завершение Реконкисты на Пиренейском полуострове', period:'Позднее Средневековье (XV век)' },
+  { date:'1492', event:'Открытие Америки Христофором Колумбом', period:'Позднее Средневековье (XV век)' },
+  { date:'1497–1499', event:'Открытие Васко да Гамой морского пути в Индию', period:'Позднее Средневековье (XV век)' },
+
+  // Реформация
+  { date:'1517', event:'Выступление М. Лютера с 95 тезисами, начало Реформации в Германии', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1519–1522', event:'Кругосветное плавание экспедиции Ф. Магеллана', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1521', event:'Вормсский рейхстаг. Осуждение М. Лютера', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1534', event:'Начало Реформации в Англии', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1555', event:'Аугсбургский религиозный мир', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1560–1598', event:'Религиозные войны во Франции', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1566–1609', event:'Освободительная война в Нидерландах', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1569', event:'Образование Речи Посполитой (Люблинская уния)', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1572', event:'Варфоломеевская ночь во Франции', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1579', event:'Утрехтская уния', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1588', event:'Разгром Англией Непобедимой армады', period:'Реформация и религиозные войны (XVI век)' },
+  { date:'1598', event:'Нантский эдикт Генриха IV во Франции', period:'Реформация и религиозные войны (XVI век)' },
+
+  // Абсолютизм и революции
+  { date:'1618–1648', event:'Тридцатилетняя война', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1624–1642', event:'Деятельность кардинала Ришелье на посту первого министра Франции', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1640', event:'Начало деятельности Долгого парламента в Англии', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1641', event:'Принятие английским парламентом «Великой ремонстрации»', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1642–1646, 1648', event:'Гражданская война в Англии', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1643–1715', event:'Правление французского короля Людовика XIV', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1648', event:'Вестфальский мир', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1649', event:'Казнь английского короля Карла I', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1649', event:'Провозглашение Англии республикой', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1653–1658', event:'Протекторат О. Кромвеля', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1660', event:'Реставрация династии Стюартов в Англии', period:'Абсолютизм и революции (XVII век)' },
+  { date:'1688', event:'«Славная революция» в Англии', period:'Абсолютизм и революции (XVII век)' }
+];
+
+/* =========================================================
+   5. ПЕРИОДЫ
+   ========================================================= */
+const RU_PERIODS = [
+  'Древняя Русь (862–1132)',
+  'Удельная раздробленность и Орда (1132–1480)',
+  'Московское государство (1480–1682)',
+  'Российская империя: становление (1682–1801)',
+  'Российская империя: апогей и кризис (1801–1917)',
+  'Революция и Гражданская война (1917–1922)',
+  'СССР: становление и апогей (1922–1953)',
+  'СССР: оттепель, застой, перестройка (1953–1991)',
+  'Постсоветская Россия (1991 – н.в.)'
+];
+
+const RU_DATE_PERIODS = [
+  'Древняя Русь (862–1132)',
+  'Удельная раздробленность и Орда (1132–1480)',
+  'Московское государство (1480–1598)',
+  'Смутное время (1598–1618)',
+  'Бунташный век (1618–1682)',
+  'Становление империей (1682–1725)',
+  'Дворцовые перевороты (1725–1762)',
+  'Эпоха просвещённого абсолютизма и реформ (1762–1825)',
+  'Имперская Россия между двумя рубежами (1825–1905)',
+  'Первая мировая и крушение империи (1914–1917)'
+];
+
+const WORLD_PERIODS = [
+  'Раннее Средневековье (V–XI века)',
+  'Зрелое Средневековье (XI–XV века)',
+  'Позднее Средневековье (XV век)',
+  'Реформация и религиозные войны (XVI век)',
+  'Абсолютизм и революции (XVII век)'
+];
+
+/* =========================================================
+   6. УТИЛИТЫ
+   ========================================================= */
+function shuffle(a) {
+  const arr = [...a];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+const ROMAN_MAP = {
+  'xx':'20','xix':'19','xviii':'18','xvii':'17','xvi':'16','xv':'15','xiv':'14',
+  'xiii':'13','xii':'12','xi':'11','x':'10','ix':'9','viii':'8','vii':'7',
+  'vi':'6','v':'5','iv':'4','iii':'3','ii':'2','i':'1'
+};
+function romanToArabic(s) {
+  let out = s.toLowerCase();
+  Object.keys(ROMAN_MAP).sort((a,b) => b.length - a.length).forEach(k => {
+    out = out.replace(new RegExp('\\b' + k + '\\b', 'g'), ROMAN_MAP[k]);
+  });
+  return out;
+}
+function normalizeDate(s) {
+  let x = String(s).toLowerCase();
+  x = romanToArabic(x);
+  x = x.replace(/\s+/g, '');
+  x = x.replace(/[–—−]/g, '-');
+  x = x.replace(/[.,;:]/g, '');
+  x = x.replace(/гг?\.?/g, '');
+  x = x.replace(/вв?\.?/g, '');
+  x = x.replace(/е$/, '');
+  x = x.replace(/начало|конец|нач|кон/g, '');
+  return x.trim();
+}
+function datesMatch(input, correct) {
+  return normalizeDate(input) === normalizeDate(correct);
+}
+function isTypeable(date) { return /^\d/.test(date); }
+
+function normalizeAnswer(s) {
+  let x = String(s).toLowerCase().trim();
+  x = x.replace(/ё/g, 'е');
+  x = romanToArabic(x);
+  x = x.replace(/[^а-яa-z0-9]/g, '');
+  return x;
+}
+function creatorMatch(userInput, correctName) {
+  const u = normalizeAnswer(userInput);
+  const c = normalizeAnswer(correctName);
+  if (!u || !c) return false;
+  if (u === c) return true;
+  if (u.length >= 4 && c.includes(u)) return true;
+  if (c.length >= 4 && u.includes(c)) return true;
+  const words = String(correctName).split(/\s+/).map(normalizeAnswer).filter(w => w.length >= 4);
+  for (const w of words) {
+    if (u.includes(w)) return true;
+  }
+  return false;
+}
+function yearMatch(userInput, correctYear) {
+  return normalizeAnswer(userInput) === normalizeAnswer(correctYear);
+}
+
+/* =========================================================
+   7. СОСТОЯНИЕ
+   ========================================================= */
+let state = {
+  screen: 'home',
+  dateSource: null,
+  dateLevel: null,
+  section: null,
+  period: null,
+  characterMode: null,
+  characterEgeLevel: null,
+  quiz: null,
+  referenceOpen: false,
+  referenceQuery: ''
+};
+
+/* =========================================================
+   8. СПРАВОЧНЫЕ ТАБЛИЦЫ
+   ========================================================= */
+function referenceTableHTML(query) {
+  const q = (query || '').toLowerCase().trim();
+  const rows = CULTURE_DATA
+    .filter(m => !q || m.name.toLowerCase().includes(q) || m.city.toLowerCase().includes(q)
+                 || (m.ruler && m.ruler.toLowerCase().includes(q))
+                 || (m.author && m.author.toLowerCase().includes(q))
+                 || m.year.includes(q) || m.desc.toLowerCase().includes(q))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+  const rowsHTML = rows.map(m => `
+    <tr>
+      <td class="name">${esc(m.name)}</td>
+      <td class="meta">${esc(m.year)}</td>
+      <td class="meta">${esc(m.city)}</td>
+      <td>${esc(m.ruler ? 'при ' + m.ruler : (m.author || '—'))}</td>
+      <td>${esc(m.desc)}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <table class="ref-table">
+      <thead>
+        <tr><th>Памятник</th><th>Год</th><th>Город</th><th>Создатель / правитель</th><th>Особенность</th></tr>
+      </thead>
+      <tbody>${rowsHTML || '<tr><td colspan="5" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+function worldReferenceTableHTML(query) {
+  const q = (query || '').toLowerCase().trim();
+  const filtered = WORLD_DATES.filter(d =>
+    !q || d.event.toLowerCase().includes(q) || d.date.includes(q) || d.period.toLowerCase().includes(q)
+  );
+  const groups = {};
+  filtered.forEach(d => {
+    if (!groups[d.period]) groups[d.period] = [];
+    groups[d.period].push(d);
+  });
+  let rows = '';
+  WORLD_PERIODS.forEach(p => {
+    if (groups[p] && groups[p].length) {
+      rows += `<tr><td colspan="2" class="ref-period">${esc(p)}</td></tr>`;
+      groups[p].forEach(d => {
+        rows += `<tr><td class="meta">${esc(d.date)}</td><td>${esc(d.event)}</td></tr>`;
+      });
+    }
+  });
+  return `<table class="ref-table">
+    <thead><tr><th>Дата</th><th>Событие</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="2" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
+  </table>`;
+}
+
+function characterReferenceTableHTML(query) {
+  const q = (query || '').toLowerCase().trim();
+  const filtered = CHARACTERS.filter(c =>
+    !q || c.name.toLowerCase().includes(q) || c.action.toLowerCase().includes(q) || c.period.toLowerCase().includes(q)
+  );
+  const groups = {};
+  filtered.forEach(c => {
+    if (!groups[c.period]) groups[c.period] = [];
+    groups[c.period].push(c);
+  });
+  let rows = '';
+  RU_PERIODS.forEach(p => {
+    if (groups[p] && groups[p].length) {
+      rows += `<tr><td colspan="2" class="ref-period">${esc(p)}</td></tr>`;
+      groups[p].forEach(c => {
+        rows += `<tr><td class="name">${esc(c.name)}</td><td>${esc(c.action)}</td></tr>`;
+      });
+    }
+  });
+  return `<table class="ref-table">
+    <thead><tr><th>Деятель</th><th>Чем известен</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="2" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
+  </table>`;
+}
+
+/* =========================================================
+   9. ГЕНЕРАТОРЫ
+   ========================================================= */
+function buildDateQuiz(source, period, reverse, level) {
+  const data = source === 'world' ? WORLD_DATES : RUSSIAN_DATES;
+  let pool = period === 'all' ? data : data.filter(d => d.period === period);
+  if (level === 'hard') pool = pool.filter(d => isTypeable(d.date));
+  if (pool.length < 1) pool = data.filter(d => level === 'hard' ? isTypeable(d.date) : true);
+
+  if (level === 'hard') {
+    return shuffle([...pool]).map(item => ({ item, options: [], correctIndex: 0, reverse: false }));
+  }
+  return shuffle([...pool]).map(item => {
+    const same = data.filter(d => d.period === item.period && d !== item && d.event !== item.event);
+    let distractors = shuffle(same).slice(0, 2);
+    if (distractors.length < 2) {
+      const others = shuffle(data.filter(d => d.period !== item.period && d.event !== item.event));
+      distractors = distractors.concat(others.slice(0, 2 - distractors.length));
+    }
+    const options = shuffle([item, ...distractors]);
+    return { item, options, correctIndex: options.indexOf(item), reverse };
+  });
+}
+
+function buildArtasovQuiz() {
+  const pool = shuffle([...CULTURE_DATA]);
+  return pool.map(m => {
+    const available = [];
+    if (getCreatorFact(m)) available.push('creator');
+    available.push('year', 'city', 'desc');
+    const type = available[Math.floor(Math.random() * available.length)];
+
+    let correctText = '';
+    switch (type) {
+      case 'creator': correctText = getCreatorFact(m).text; break;
+      case 'year':    correctText = getYearFact(m); break;
+      case 'city':    correctText = getCityFact(m); break;
+      case 'desc':    correctText = getDescFact(m); break;
+    }
+
+    const others = shuffle(CULTURE_DATA.filter(x => x.name !== m.name));
+    const distractors = [];
+    for (const o of others) {
+      let f = '';
+      switch (type) {
+        case 'creator': { const c = getCreatorFact(o); if (!c) continue; f = c.text; break; }
+        case 'year':    f = getYearFact(o); break;
+        case 'city':    f = getCityFact(o); break;
+        case 'desc':    f = getDescFact(o); break;
+      }
+      if (f && f !== correctText && !distractors.some(d => d.text === f)) {
+        distractors.push({ text: f, monument: o });
+      }
+      if (distractors.length >= 2) break;
+    }
+    while (distractors.length < 2) {
+      const o = others[distractors.length];
+      let f = '';
+      switch (type) {
+        case 'creator': { const c = getCreatorFact(o); f = c ? c.text : ''; break; }
+        case 'year':    f = getYearFact(o); break;
+        case 'city':    f = getCityFact(o); break;
+        case 'desc':    f = getDescFact(o); break;
+      }
+      if (f) distractors.push({ text: f, monument: o });
+    }
+
+    const correctOpt = { text: correctText, monument: m };
+    const options = shuffle([correctOpt, ...distractors]);
+    return { monument: m, type, fact: correctText, options, correctIndex: options.indexOf(correctOpt) };
+  });
+}
+
+function buildOlimpiadnikQuiz() {
+  const questions = [];
+  for (const m of CULTURE_DATA) {
+    const c = getCreatorFact(m);
+    if (c) {
+      const isRuler = c.kind === 'ruler';
+      const answer = isRuler ? m.ruler : m.author;
+      if (answer && !isGenericAuthor(answer)) {
+        questions.push({
+          monument: m,
+          kind: isRuler ? 'ruler' : 'author',
+          question: isRuler
+            ? `При ком был создан/построен «${m.name}»?`
+            : `Кто автор «${m.name}»?`,
+          expected: answer,
+          checkFn: (v) => creatorMatch(v, answer)
+        });
+      }
+    }
+    questions.push({
+      monument: m,
+      kind: 'year',
+      question: `В каком году был(о) создан(о)/построен(о) «${m.name}»?`,
+      expected: m.year,
+      checkFn: (v) => yearMatch(v, m.year)
+    });
+  }
+  return shuffle(questions);
+}
+
+function buildCharacterCardsQuiz(reverse) {
+  const all = CHARACTERS;
+  const pool = shuffle([...all]);
+  return pool.map(item => {
+    const same = all.filter(c => c.period === item.period && c.name !== item.name && c.action !== item.action);
+    let distractors = shuffle(same).slice(0, 2);
+    if (distractors.length < 2) {
+      const others = shuffle(all.filter(c => c.period !== item.period && c.action !== item.action));
+      distractors = distractors.concat(others.slice(0, 2 - distractors.length));
+    }
+    const options = shuffle([item, ...distractors]);
+    return { item, options, correctIndex: options.indexOf(item), reverse };
+  });
+}
+function buildOneCharacterEgeRound(pool, reverse) {
+  if (pool.length < 6) pool = CHARACTERS;
+  const picked = shuffle([...pool]).slice(0, 6);
+  const correct = picked.slice(0, 4);
+  const decoys  = picked.slice(4, 6);
+  const allActivities = shuffle([...correct.map(c => c.action), ...decoys.map(c => c.action)]);
+  const correctForPerson = correct.map(c => allActivities.indexOf(c.action) + 1);
+  const reverseActivities = shuffle(correct.map(c => c.action));
+  const reversePersons = shuffle([...correct, ...decoys]);
+  const correctForActivity = reverseActivities.map(a => {
+    const person = correct.find(c => c.action === a);
+    return reversePersons.indexOf(person) + 1;
+  });
+  return { correct, decoys, activities: allActivities, correctForPerson, reverseActivities, reversePersons, correctForActivity };
+}
+function buildCharacterEgeQuiz(period) {
+  const roundCount = 3;
+  let pool;
+  if (period === 'all') pool = CHARACTERS;
+  else {
+    pool = CHARACTERS.filter(c => c.period === period);
+    if (pool.length < 6) pool = CHARACTERS;
+  }
+  const rounds = [];
+  for (let i = 0; i < roundCount; i++) rounds.push(buildOneCharacterEgeRound(pool, false));
+  return rounds;
+}
+
+/* =========================================================
+   10. РЕНДЕР
+   ========================================================= */
+const app = document.getElementById('app');
+
+function render() {
+  document.body.classList.toggle('ref-open', !!state.referenceOpen && state.screen === 'quiz');
+  switch (state.screen) {
+    case 'home':                 renderHome(); break;
+    case 'dateLevel':            renderDateLevel(); break;
+    case 'datePeriods':          renderDatePeriods(); break;
+    case 'worldReference':       renderWorldReference(); break;
+    case 'culture':              renderCultureMenu(); break;
+    case 'reference':            renderReferenceFull(); break;
+    case 'characters':           renderCharactersMenu(); break;
+    case 'characterReference':   renderCharacterReference(); break;
+    case 'characterEgeLevels':   renderCharacterEgeLevels(); break;
+    case 'characterEgePeriods':  renderCharacterEgePeriods(); break;
+    case 'quiz':                 renderQuiz(); break;
+    case 'result':               renderResult(); break;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function header() {
+  return `<div class="brand"><h1>📜 ЕГЭ · История</h1><p>Тренажёр для подготовки</p></div>`;
+}
+
+function renderHome() {
+  app.innerHTML = `
+    ${header()}
+    <div class="home-cards fade-in">
+      <div class="home-card" onclick="goDates()">
+        <div class="icon">📅</div>
+        <h3>Даты · Россия</h3>
+        <p>Хронология отечественной истории</p>
+      </div>
+      <div class="home-card" onclick="goWorld()">
+        <div class="icon">🌍</div>
+        <h3>Всеобщая история</h3>
+        <p>Ключевые даты мировой истории</p>
+      </div>
+      <div class="home-card" onclick="goCulture()">
+        <div class="icon">🏛</div>
+        <h3>Культура</h3>
+        <p>Справочник и тренажёры по зодчеству</p>
+      </div>
+      <div class="home-card" onclick="goCharacters()">
+        <div class="icon">👤</div>
+        <h3>Персонажи</h3>
+        <p>Деятели и их дела</p>
+      </div>
+    </div>
+  `;
+}
+function goDates()      { state.screen = 'dateLevel'; state.dateSource = 'russian'; state.dateLevel = null; state.referenceOpen = false; render(); }
+function goWorld()      { state.screen = 'dateLevel'; state.dateSource = 'world';   state.dateLevel = null; state.referenceOpen = false; render(); }
+function goCulture()    { state.screen = 'culture'; state.section = 'culture'; state.referenceOpen = false; render(); }
+function goCharacters() { state.screen = 'characters'; state.characterMode = null; state.characterEgeLevel = null; state.referenceOpen = false; render(); }
+function goHome()       { state.screen = 'home'; state.quiz = null; state.dateLevel = null; state.characterMode = null; state.characterEgeLevel = null; state.referenceOpen = false; render(); }
+
+/* --- ДАТЫ: level --- */
+function renderDateLevel() {
+  const isWorld = state.dateSource === 'world';
+  const title = isWorld ? '🌍 Всеобщая история — выбери уровень' : '📅 Даты · Россия — выбери уровень';
+  const sub = isWorld
+    ? 'Даты мировой истории от падения Рима до XVII века'
+    : 'Отечественная история от Рюрика до 1917 года';
+
+  const cardsHTML = isWorld ? `
+    <div class="level-cards three fade-in">
+      <div class="level-card ref" onclick="goWorldReference()">
+        <div class="icon">📖</div>
+        <h3>Хронология</h3>
+        <p>Все даты всеобщей истории по периодам. Можно листать и искать.</p>
+        <span class="tag">справочник</span>
+      </div>
+      <div class="level-card easy" onclick="pickLevel('easy')">
+        <div class="icon">🧪</div>
+        <h3>Дитя Артасова</h3>
+        <p>Обычный тест: дано событие — выбираешь один из трёх вариантов. Есть кнопка «Реверс».</p>
+        <span class="tag">тест · 3 варианта</span>
+      </div>
+      <div class="level-card hard" onclick="pickLevel('hard')">
+        <div class="icon">🔥</div>
+        <h3>Жесть ты олимпиадник</h3>
+        <p>Дано событие — сам печатаешь дату. Ошибся — увидишь правильный ответ.</p>
+        <span class="tag">печать · без вариантов</span>
+      </div>
+    </div>
+  ` : `
+    <div class="level-cards fade-in">
+      <div class="level-card easy" onclick="pickLevel('easy')">
+        <div class="icon">🧪</div>
+        <h3>Дитя Артасова</h3>
+        <p>Обычный тест: дано событие — выбираешь один из трёх вариантов. Есть кнопка «Реверс».</p>
+        <span class="tag">тест · 3 варианта</span>
+      </div>
+      <div class="level-card hard" onclick="pickLevel('hard')">
+        <div class="icon">🔥</div>
+        <h3>Жесть ты олимпиадник</h3>
+        <p>Дано событие — сам печатаешь дату (год или промежуток через тире). Ошибся — увидишь правильный ответ.</p>
+        <span class="tag">печать · без вариантов</span>
+      </div>
+    </div>
+  `;
+
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="section-title">${title}</div>
+        <div class="section-sub" style="margin-bottom:0">${sub}</div>
+      </div>
+    </div>
+    ${cardsHTML}
+  `;
+}
+function goWorldReference() { state.screen = 'worldReference'; state.referenceQuery = ''; render(); }
+function pickLevel(level) {
+  state.dateLevel = level;
+  state.screen = 'datePeriods';
+  render();
+}
+function renderDatePeriods() {
+  const isWorld = state.dateSource === 'world';
+  const periods = isWorld ? WORLD_PERIODS : RU_DATE_PERIODS;
+  const data = isWorld ? WORLD_DATES : RUSSIAN_DATES;
+  const counts = {};
+  periods.forEach(p => {
+    let list = data.filter(d => d.period === p);
+    if (state.dateLevel === 'hard') list = list.filter(d => isTypeable(d.date));
+    counts[p] = list.length;
+  });
+  const items = periods.map(p => {
+    const n = counts[p] || 0;
+    const disabled = n === 0;
+    return `
+      <div class="period-item ${disabled ? 'disabled' : ''}"
+           ${disabled ? '' : `onclick="startDateQuiz('${esc(p).replace(/'/g, "\\'")}')"`}>
+        <span>${esc(p)}</span>
+        <span class="count">${disabled ? '<span class="soon-badge">скоро</span>' : n + ' дат'}</span>
+      </div>
+    `;
+  }).join('');
+  let total = data;
+  if (state.dateLevel === 'hard') total = total.filter(d => isTypeable(d.date));
+  const title = isWorld ? '🌍 Всеобщая история' : '📅 Даты · Россия';
+  const levelBadge = state.dateLevel === 'hard'
+    ? '<span style="color:#c62828">· 🔥 Режим: печатать дату</span>'
+    : '<span style="color:#2e7d32">· 🧪 Режим: тест</span>';
+
+  const refLink = isWorld
+    ? `<div class="period-item" onclick="goWorldReference()" style="border-color:var(--gold);">
+         <span>📖 Хронология (справочник)</span>
+         <span class="count">${WORLD_DATES.length} дат</span>
+       </div>`
+    : '';
+
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="backToLevel()">←</button>
+      <div>
+        <div class="section-title">${title}</div>
+        <div class="section-sub" style="margin-bottom:0">${levelBadge}</div>
+      </div>
+    </div>
+    <div class="period-list fade-in">
+      ${refLink}
+      <div class="period-item" onclick="startDateQuiz('all')">
+        <span>🎲 Все периоды (микс)</span>
+        <span class="count">${total.length} дат</span>
+      </div>
+      ${items}
+    </div>
+  `;
+}
+function backToLevel() { state.screen = 'dateLevel'; render(); }
+
+/* --- Мировая хронология (полная страница) --- */
+function renderWorldReference() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="backToLevel()">←</button>
+      <div>
+        <div class="section-title">📖 Хронология всеобщей истории</div>
+        <div class="section-sub" style="margin-bottom:0">Все даты по периодам</div>
+      </div>
+    </div>
+    <div class="ref-full-wrap fade-in">
+      <input class="ref-search" type="text" placeholder="🔎 Поиск по дате, событию или периоду…"
+             value="${esc(state.referenceQuery)}"
+             oninput="updateReferenceQuery(this.value)">
+      <div id="refTableWrap" style="max-height:70vh; overflow-y:auto;">
+        ${worldReferenceTableHTML(state.referenceQuery)}
+      </div>
+    </div>
+  `;
+}
+
+/* --- КУЛЬТУРА --- */
+function renderCultureMenu() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="section-title">🏛 Культура</div>
+        <div class="section-sub" style="margin-bottom:0">Выбери раздел</div>
+      </div>
+    </div>
+    <div class="level-cards three fade-in">
+      <div class="level-card ref" onclick="goReference()">
+        <div class="icon">📖</div>
+        <h3>Справочная летопись «Сме(к)та»</h3>
+        <p>Все памятники архитектуры, их годы, создатели и особенности. Можно листать и искать.</p>
+        <span class="tag">справочник</span>
+      </div>
+      <div class="level-card easy" onclick="startArtasov()">
+        <div class="icon">🧪</div>
+        <h3>Дитя Артасова</h3>
+        <p>Сверху — памятник, снизу — три факта, один верный. Есть «Реверс» и «Подглянуть в справочник» (−0,25 за задание).</p>
+        <span class="tag">тест · 3 факта</span>
+      </div>
+      <div class="level-card hard" onclick="startOlimpiadnik()">
+        <div class="icon">🔥</div>
+        <h3>Жесть ты олимпиадник</h3>
+        <p>Вопрос про памятник. Впиши ответ без склонения, с маленькой буквы, слитно — как на ЕГЭ.</p>
+        <span class="tag">ввод · без вариантов</span>
+      </div>
+    </div>
+  `;
+}
+function goReference() { state.screen = 'reference'; state.referenceQuery = ''; render(); }
+
+function renderReferenceFull() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goCulture()">←</button>
+      <div>
+        <div class="section-title">📖 Справочная летопись «Сме(к)та»</div>
+        <div class="section-sub" style="margin-bottom:0">Всё о памятниках русской архитектуры</div>
+      </div>
+    </div>
+    <div class="ref-full-wrap fade-in">
+      <input class="ref-search" type="text" placeholder="🔎 Поиск по названию, году, городу или создателю…"
+             value="${esc(state.referenceQuery)}"
+             oninput="updateReferenceQuery(this.value)">
+      <div id="refTableWrap" style="max-height:70vh; overflow-y:auto;">
+        ${referenceTableHTML(state.referenceQuery)}
+      </div>
+    </div>
+  `;
+}
+function updateReferenceQuery(v) {
+  state.referenceQuery = v;
+  const wrap = document.getElementById('refTableWrap');
+  if (!wrap) return;
+  if (state.screen === 'reference') wrap.innerHTML = referenceTableHTML(v);
+  else if (state.screen === 'worldReference') wrap.innerHTML = worldReferenceTableHTML(v);
+  else if (state.screen === 'characterReference') wrap.innerHTML = characterReferenceTableHTML(v);
+}
+
+/* --- ПЕРСОНАЖИ --- */
+function renderCharactersMenu() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="section-title">👤 Персонажи</div>
+        <div class="section-sub" style="margin-bottom:0">Выбери режим</div>
+      </div>
+    </div>
+    <div class="level-cards three fade-in">
+      <div class="level-card ref" onclick="goCharacterReference()">
+        <div class="icon">📖</div>
+        <h3>Справочник «Персоналии»</h3>
+        <p>Все деятели по эпохам и их дела. Можно листать и искать.</p>
+        <span class="tag">справочник</span>
+      </div>
+      <div class="level-card easy" onclick="startCharacterCards()">
+        <div class="icon">🧪</div>
+        <h3>Тест-карточки</h3>
+        <p>Сверху имя деятеля — снизу три варианта того, что он мог сделать. Есть кнопка «Реверс».</p>
+        <span class="tag">тест · 3 варианта</span>
+      </div>
+      <div class="level-card hard" onclick="goCharacterEgeLevels()">
+        <div class="icon">🔥</div>
+        <h3>Задание ЕГЭ</h3>
+        <p>Соотнесение деятелей (А–Г) с их делами (1–6) как на ЕГЭ. Есть кнопка «Реверс».</p>
+        <span class="tag">соответствие · 4 × 6</span>
+      </div>
+    </div>
+  `;
+}
+function goCharacterReference() { state.screen = 'characterReference'; state.referenceQuery = ''; render(); }
+
+function renderCharacterReference() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goCharacters()">←</button>
+      <div>
+        <div class="section-title">📖 Справочник «Персоналии»</div>
+        <div class="section-sub" style="margin-bottom:0">Деятели по эпохам и их дела</div>
+      </div>
+    </div>
+    <div class="ref-full-wrap fade-in">
+      <input class="ref-search" type="text" placeholder="🔎 Поиск по имени, делу или эпохе…"
+             value="${esc(state.referenceQuery)}"
+             oninput="updateReferenceQuery(this.value)">
+      <div id="refTableWrap" style="max-height:70vh; overflow-y:auto;">
+        ${characterReferenceTableHTML(state.referenceQuery)}
+      </div>
+    </div>
+  `;
+}
+
+function goCharacterEgeLevels() {
+  state.screen = 'characterEgeLevels';
+  state.characterMode = 'ege';
+  render();
+}
+function renderCharacterEgeLevels() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goCharacters()">←</button>
+      <div>
+        <div class="section-title">🔥 Задание ЕГЭ — выбери уровень</div>
+        <div class="section-sub" style="margin-bottom:0">Соотнеси деятелей и их дела</div>
+      </div>
+    </div>
+    <div class="level-cards fade-in">
+      <div class="level-card easy" onclick="pickCharacterEgeLevel('easy')">
+        <div class="icon">🧪</div>
+        <h3>Дитя Артасова</h3>
+        <p>4 деятеля и 6 вариантов их дел — из всего списка случайно, как на настоящем ЕГЭ.</p>
+        <span class="tag">случайно · из всех эпох</span>
+      </div>
+      <div class="level-card hard" onclick="pickCharacterEgeLevel('hard')">
+        <div class="icon">🔥</div>
+        <h3>Жесть ты олимпиадник</h3>
+        <p>Все деятели — из одной эпохи. Сложнее не перепутать деятелей одной эпохи.</p>
+        <span class="tag">одна эпоха</span>
+      </div>
+    </div>
+  `;
+}
+function pickCharacterEgeLevel(level) {
+  state.characterEgeLevel = level;
+  if (level === 'easy') startCharacterEge('all');
+  else { state.screen = 'characterEgePeriods'; render(); }
+}
+function renderCharacterEgePeriods() {
+  const items = RU_PERIODS.map(p => {
+    const n = CHARACTERS.filter(c => c.period === p).length;
+    const disabled = n < 6;
+    return `
+      <div class="period-item ${disabled ? 'disabled' : ''}"
+           ${disabled ? '' : `onclick="startCharacterEge('${esc(p).replace(/'/g, "\\'")}')"`}>
+        <span>${esc(p)}</span>
+        <span class="count">${disabled ? '<span class="soon-badge">мало деятелей</span>' : n + ' чел.'}</span>
+      </div>
+    `;
+  }).join('');
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goCharacterEgeLevels()">←</button>
+      <div>
+        <div class="section-title">🔥 Задание ЕГЭ</div>
+        <div class="section-sub" style="margin-bottom:0">Выбери эпоху</div>
+      </div>
+    </div>
+    <div class="period-list fade-in">
+      <div class="period-item" onclick="startCharacterEge('all')">
+        <span>🎲 Все эпохи (микс)</span>
+        <span class="count">${CHARACTERS.length} чел.</span>
+      </div>
+      ${items}
+    </div>
+  `;
+}
+
+/* --- СТАРТЫ ВИКТОРИН --- */
+function startDateQuiz(period) {
+  const reverse = false;
+  const questions = buildDateQuiz(state.dateSource, period, reverse, state.dateLevel);
+  state.section = 'dates';
+  state.period = period;
+  state.quiz = {
+    questions, index: 0,
+    answers: new Array(questions.length).fill(null),
+    reverse, locked: new Array(questions.length).fill(false)
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+function startArtasov() {
+  state.section = 'artasov';
+  state.period = 'all';
+  const questions = buildArtasovQuiz();
+  state.quiz = {
+    mode: 'artasov',
+    questions, index: 0,
+    answers: new Array(questions.length).fill(null),
+    reverse: false,
+    locked: new Array(questions.length).fill(false),
+    peeked: new Array(questions.length).fill(false)
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+function startOlimpiadnik() {
+  state.section = 'olimpiadnik';
+  state.period = 'all';
+  const questions = buildOlimpiadnikQuiz();
+  state.quiz = {
+    mode: 'olimpiadnik',
+    questions, index: 0,
+    answers: new Array(questions.length).fill(null),
+    reverse: false,
+    locked: new Array(questions.length).fill(false)
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+function startCharacterCards() {
+  state.section = 'characters';
+  state.characterMode = 'cards';
+  state.period = 'all';
+  const questions = buildCharacterCardsQuiz(false);
+  state.quiz = {
+    mode: 'cards', questions, index: 0,
+    answers: new Array(questions.length).fill(null),
+    reverse: false, locked: new Array(questions.length).fill(false)
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+function startCharacterEge(period) {
+  state.section = 'characters';
+  state.characterMode = 'ege';
+  state.period = period;
+  const rounds = buildCharacterEgeQuiz(period);
+  state.quiz = {
+    mode: 'ege', rounds, index: 0,
+    answers: rounds.map(() => [null, null, null, null]),
+    locked: rounds.map(() => false),
+    reverse: false
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+
+/* --- РЕВЕРС --- */
+function restartReverse() {
+  const q = state.quiz;
+  if (state.section === 'artasov') {
+    q.reverse = !q.reverse;
+    q.index = 0;
+    q.answers = new Array(q.questions.length).fill(null);
+    q.locked = new Array(q.questions.length).fill(false);
+    q.peeked = new Array(q.questions.length).fill(false);
+    state.referenceOpen = false;
+    render();
+    return;
+  }
+  if (state.section === 'characters' && q.mode === 'ege') {
+    q.reverse = !q.reverse;
+    q.answers = q.rounds.map(() => [null, null, null, null]);
+    q.locked = q.rounds.map(() => false);
+    q.index = 0;
+    render();
+    return;
+  }
+  if (state.section === 'characters' && q.mode === 'cards') {
+    const questions = buildCharacterCardsQuiz(!q.reverse);
+    state.quiz = {
+      mode: 'cards', questions, index: 0,
+      answers: new Array(questions.length).fill(null),
+      reverse: !q.reverse, locked: new Array(questions.length).fill(false)
+    };
+    render();
+    return;
+  }
+  const reverse = !q.reverse;
+  const questions = buildDateQuiz(state.dateSource, state.period, reverse, state.dateLevel);
+  state.quiz = {
+    questions, index: 0,
+    answers: new Array(questions.length).fill(null),
+    reverse, locked: new Array(questions.length).fill(false)
+  };
+  render();
+}
+
+/* --- Справочник (боковая панель) --- */
+function toggleReference() {
+  state.referenceOpen = !state.referenceOpen;
+  if (state.referenceOpen && state.section === 'artasov' && state.quiz && state.quiz.peeked) {
+    state.quiz.peeked[state.quiz.index] = true;
+  }
+  render();
+}
+
+/* =========================================================
+   11. РЕНДЕР КВИЗА
+   ========================================================= */
+function renderQuiz() {
+  const q = state.quiz;
+
+  if (state.section === 'characters' && q.mode === 'ege') { renderCharacterEgeQuiz(); return; }
+  if (state.section === 'characters' && q.mode === 'cards') { renderCharacterCardsQuiz(); return; }
+  if (state.section === 'artasov') { renderArtasovQuiz(); return; }
+  if (state.section === 'olimpiadnik') { renderOlimpiadnikQuiz(); return; }
+
+  /* --- ДАТЫ --- */
+  const item = q.questions[q.index];
+  const total = q.questions.length;
+  const answered = q.locked[q.index];
+  const selected = q.answers[q.index];
+  const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
+  const progressPct = (q.index / total) * 100;
+  const showRef = state.dateSource === 'world';
+
+  let questionHTML = '';
+  let optionsHTML = '';
+
+  if (isTyping) {
+    const ans = answered ? selected : null;
+    questionHTML = `
+      <div class="q-label">Назови дату</div>
+      <div class="q-text-sm">${esc(item.item.event)}</div>
+    `;
+    optionsHTML = `
+      <div class="typing-area">
+        <input type="text" id="dateInput" class="date-input"
+               placeholder="Например: 988 или 862–879"
+               value="${ans ? esc(ans.value) : ''}"
+               ${answered ? 'disabled' : ''}
+               onkeydown="if(event.key==='Enter'){ event.preventDefault(); handleTypedEnter(); }">
+        ${!answered
+          ? `<button class="btn-primary" onclick="checkTyped()">Проверить</button>`
+          : `<button class="btn-primary" onclick="nextTyped()">Дальше →</button>`}
+      </div>
+      ${answered ? `
+        <div class="feedback ${ans.correct ? 'fb-correct' : 'fb-wrong'}">
+          ${ans.correct
+            ? `✅ Верно! <b>${esc(item.item.date)}</b>`
+            : `❌ Неверно. Правильный ответ: <b>${esc(item.item.date)}</b>`}
+        </div>
+      ` : ''}
+    `;
+  } else {
+    if (!q.reverse) {
+      questionHTML = `<div class="q-label">Что произошло в это время?</div><div class="q-text">${esc(item.item.date)}</div>`;
+      optionsHTML = item.options.map((opt, i) => {
+        let cls = 'option';
+        if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+        return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+          <span class="num">${i + 1}</span>
+          <span class="opt-body"><span class="opt-title">${esc(opt.event)}</span></span>
+        </button>`;
+      }).join('');
+    } else {
+      questionHTML = `<div class="q-label">В каком году произошло?</div><div class="q-text-sm">${esc(item.item.event)}</div>`;
+      optionsHTML = item.options.map((opt, i) => {
+        let cls = 'option';
+        if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+        return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+          <span class="num">${i + 1}</span>
+          <span class="opt-body"><span class="opt-title">${esc(opt.date)}</span></span>
+        </button>`;
+      }).join('');
+    }
+  }
+
+  const showReverse = !isTyping;
+  const refBtnLabel = state.referenceOpen ? '📖 Убрать справочник' : '📖 Подглянуть в справочник';
+
+  const inner = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevQuestion()"'} title="Назад">←</button>
+      <div class="progress-text">Вопрос ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        ${showRef ? `<button class="mini-btn primary" onclick="toggleReference()">${refBtnLabel}</button>` : ''}
+        ${showReverse ? `<button class="mini-btn" onclick="restartReverse()" title="Реверс">🔁 Реверс</button>` : ''}
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in">${questionHTML}</div>
+    <div class="options fade-in">${optionsHTML}</div>
+  `;
+
+  if (showRef && state.referenceOpen) {
+    app.innerHTML = `
+      <div class="ref-layout open">
+        <div class="ref-main">${inner}</div>
+        <aside class="ref-side">
+          <div class="ref-title">📖 Хронология</div>
+          <div class="ref-sub">Всеобщая история — все даты по периодам</div>
+          <div id="refSideWrap">${worldReferenceTableHTML('')}</div>
+        </aside>
+      </div>
+    `;
+  } else {
+    app.innerHTML = inner;
+  }
+
+  if (isTyping && !answered) {
+    setTimeout(() => {
+      const inp = document.getElementById('dateInput');
+      if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    }, 60);
+  }
+}
+
+/* --- РЕНДЕР: Дитя Артасова (культура) --- */
+function renderArtasovQuiz() {
+  const q = state.quiz;
+  const item = q.questions[q.index];
+  const total = q.questions.length;
+  const answered = q.locked[q.index];
+  const selected = q.answers[q.index];
+  const progressPct = (q.index / total) * 100;
+  const reverse = q.reverse;
+  const peeked = q.peeked[q.index];
+
+  let questionHTML, optionsHTML;
+
+  if (!reverse) {
+    questionHTML = `
+      <div class="q-label">Что это за памятник?</div>
+      <div class="q-text-sm">${esc(item.monument.name)}</div>
+      <div class="q-desc">Выбери верный факт о нём</div>
+    `;
+    optionsHTML = item.options.map((opt, i) => {
+      let cls = 'option';
+      if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+      return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+        <span class="num">${i + 1}</span>
+        <span class="opt-body"><span class="opt-title">${esc(opt.text)}</span></span>
+      </button>`;
+    }).join('');
+  } else {
+    questionHTML = `
+      <div class="q-label">Какому памятнику соответствует факт?</div>
+      <div class="q-text-sm">${esc(item.fact)}</div>
+    `;
+    optionsHTML = item.options.map((opt, i) => {
+      let cls = 'option';
+      if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+      return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+        <span class="num">${i + 1}</span>
+        <span class="opt-body"><span class="opt-title">${esc(opt.monument.name)}</span></span>
+      </button>`;
+    }).join('');
+  }
+
+  const peekLabel = state.referenceOpen ? '📖 Убрать справочник' : '📖 Подглянуть в справочник';
+
+  app.innerHTML = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevQuestion()"'} title="Назад">←</button>
+      <div class="progress-text">
+        Вопрос ${q.index + 1} из ${total}
+        ${peeked ? '<span class="peeked-badge" style="margin-left:8px;">📖 −0,25</span>' : ''}
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="mini-btn primary" onclick="toggleReference()">${peekLabel}</button>
+        <button class="mini-btn" onclick="restartReverse()" title="Реверс">🔁 Реверс</button>
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="ref-layout ${state.referenceOpen ? 'open' : ''}">
+      <div class="ref-main fade-in">
+        <div class="question-box">${questionHTML}</div>
+        <div class="options">${optionsHTML}</div>
+      </div>
+      <aside class="ref-side">
+        <div class="ref-title">📖 Сме(к)та</div>
+        <div class="ref-sub">Справочная летопись памятников</div>
+        <div id="refSideWrap">${referenceTableHTML(state.referenceQuery)}</div>
+      </aside>
+    </div>
+  `;
+}
+
+/* --- РЕНДЕР: Жесть ты олимпиадник (культура) --- */
+function renderOlimpiadnikQuiz() {
+  const q = state.quiz;
+  const item = q.questions[q.index];
+  const total = q.questions.length;
+  const answered = q.locked[q.index];
+  const ans = q.answers[q.index];
+  const progressPct = (q.index / total) * 100;
+
+  const placeholder = item.kind === 'year'
+    ? 'Например: 1165 или 1158–1160'
+    : 'Например: андрейбоголюбский';
+
+  app.innerHTML = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevOlimpiadnik()"'} title="Назад">←</button>
+      <div class="progress-text">Вопрос ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px;">
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in">
+      <div class="q-label">Ответь на вопрос о памятнике</div>
+      <div class="q-text-sm" style="margin-top:6px;">${esc(item.question)}</div>
+      <div class="q-desc">Ответ пиши с маленькой буквы, без пробелов и знаков. Например: андрейбоголюбский</div>
+    </div>
+    <div class="typing-area">
+      <input type="text" id="olimpInput" class="date-input"
+             placeholder="${placeholder}"
+             value="${ans ? esc(ans.value) : ''}"
+             ${answered ? 'disabled' : ''}
+             onkeydown="if(event.key==='Enter'){ event.preventDefault(); handleOlimpiadnikEnter(); }">
+      ${!answered
+        ? `<button class="btn-primary" onclick="checkOlimpiadnik()">Проверить</button>`
+        : `<button class="btn-primary" onclick="nextOlimpiadnik()">Дальше →</button>`}
+    </div>
+    ${answered ? `
+      <div class="feedback ${ans.correct ? 'fb-correct' : 'fb-wrong'}" style="margin-top:14px;">
+        ${ans.correct
+          ? `✅ Верно! Ответ: <b>${esc(item.expected)}</b>`
+          : `❌ Неверно. Правильный ответ: <b>${esc(item.expected)}</b>`}
+      </div>
+    ` : ''}
+  `;
+
+  if (!answered) {
+    setTimeout(() => {
+      const inp = document.getElementById('olimpInput');
+      if (inp) inp.focus();
+    }, 60);
+  }
+}
+function checkOlimpiadnik() {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const input = document.getElementById('olimpInput');
+  if (!input) return;
+  const value = input.value.trim();
+  if (!value) { input.focus(); return; }
+  const item = q.questions[q.index];
+  const correct = item.checkFn(value);
+  q.answers[q.index] = { value, correct };
+  q.locked[q.index] = true;
+  render();
+}
+function nextOlimpiadnik() {
+  const q = state.quiz;
+  if (q.index < q.questions.length - 1) { q.index++; render(); }
+  else { state.screen = 'result'; render(); }
+}
+function prevOlimpiadnik() {
+  const q = state.quiz;
+  if (q.index > 0) { q.index--; render(); }
+}
+function handleOlimpiadnikEnter() {
+  const q = state.quiz;
+  if (q.locked[q.index]) nextOlimpiadnik();
+  else checkOlimpiadnik();
+}
+
+/* --- Персонажи: карточки --- */
+function renderCharacterCardsQuiz() {
+  const q = state.quiz;
+  const item = q.questions[q.index];
+  const total = q.questions.length;
+  const answered = q.locked[q.index];
+  const selected = q.answers[q.index];
+  const progressPct = (q.index / total) * 100;
+  const reverse = q.reverse;
+
+  let questionHTML, optionsHTML;
+
+  if (!reverse) {
+    questionHTML = `
+      <div class="q-label">Чем известен этот деятель?</div>
+      <div class="q-text-sm">${esc(item.item.name)}</div>
+      <div class="q-desc">${esc(item.item.period)}</div>
+    `;
+    optionsHTML = item.options.map((opt, i) => {
+      let cls = 'option';
+      if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+      return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+        <span class="num">${i + 1}</span>
+        <span class="opt-body"><span class="opt-title">${esc(opt.action)}</span></span>
+      </button>`;
+    }).join('');
+  } else {
+    questionHTML = `
+      <div class="q-label">Кто это сделал?</div>
+      <div class="q-text-sm">${esc(item.item.action)}</div>
+    `;
+    optionsHTML = item.options.map((opt, i) => {
+      let cls = 'option';
+      if (answered) { cls += ' locked'; if (i === item.correctIndex) cls += ' correct'; else if (i === selected) cls += ' wrong'; }
+      return `<button class="${cls}" ${answered ? 'disabled' : `onclick="answer(${i})"`}>
+        <span class="num">${i + 1}</span>
+        <span class="opt-body"><span class="opt-title">${esc(opt.name)}</span>
+        <div class="opt-meta">${esc(opt.period)}</div></span>
+      </button>`;
+    }).join('');
+  }
+
+  const refBtnLabel = state.referenceOpen ? '📖 Убрать справочник' : '📖 Подглянуть в справочник';
+
+  const inner = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevQuestion()"'} title="Назад">←</button>
+      <div class="progress-text">Вопрос ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="mini-btn primary" onclick="toggleReference()">${refBtnLabel}</button>
+        <button class="mini-btn" onclick="restartReverse()" title="Реверс">🔁 Реверс</button>
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in">${questionHTML}</div>
+    <div class="options fade-in">${optionsHTML}</div>
+  `;
+
+  if (state.referenceOpen) {
+    app.innerHTML = `
+      <div class="ref-layout open">
+        <div class="ref-main">${inner}</div>
+        <aside class="ref-side">
+          <div class="ref-title">📖 Персоналии</div>
+          <div class="ref-sub">Деятели по эпохам</div>
+          <div>${characterReferenceTableHTML('')}</div>
+        </aside>
+      </div>
+    `;
+  } else {
+    app.innerHTML = inner;
+  }
+}
+
+/* --- Персонажи: задание ЕГЭ --- */
+function renderCharacterEgeQuiz() {
+  const q = state.quiz;
+  const round = q.rounds[q.index];
+  const total = q.rounds.length;
+  const reverse = q.reverse;
+  const userAns = q.answers[q.index];
+  const locked = q.locked[q.index];
+  const progressPct = (q.index / total) * 100;
+
+  let leftItems, rightItems, correctForLeft;
+  if (!reverse) {
+    leftItems = round.correct;
+    rightItems = round.activities;
+    correctForLeft = round.correctForPerson;
+  } else {
+    leftItems = round.reverseActivities;
+    rightItems = round.reversePersons;
+    correctForLeft = round.correctForActivity;
+  }
+
+  function numBtnClass(personIdx, num) {
+    const chosen = userAns[personIdx];
+    if (!locked) return chosen === num ? 'ege-num-btn selected' : 'ege-num-btn';
+    if (correctForLeft[personIdx] === num) return 'ege-num-btn correct';
+    if (chosen === num && chosen !== correctForLeft[personIdx]) return 'ege-num-btn wrong';
+    return 'ege-num-btn';
+  }
+
+  const letters = ['А','Б','В','Г'];
+
+  const rowsHTML = leftItems.map((it, i) => {
+    const promptText = reverse ? it : `${it.name}`;
+    return `
+      <div class="ege-row">
+        <div class="ege-letter">${letters[i]}</div>
+        <div class="ege-prompt">${esc(promptText)}</div>
+        <div class="ege-nums">
+          ${[1,2,3,4,5,6].map(n => `
+            <button class="${numBtnClass(i, n)}"
+              ${locked ? 'disabled' : `onclick="pickEgeNum(${i}, ${n})"`}
+              data-n="${n}">${n}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const rightListHTML = rightItems.map((it, i) => {
+    const text = reverse ? it.name : it;
+    const meta = reverse ? `<div style="color:#6b6b6b;font-size:12px;font-family:sans-serif;margin-top:2px">${esc(it.period)}</div>` : '';
+    return `
+      <div class="opt-row">
+        <div class="num-badge">${i + 1}</div>
+        <div class="opt-text">${esc(text)}${meta}</div>
+      </div>
+    `;
+  }).join('');
+
+  const allFilled = userAns.every(v => v !== null);
+  const correctCount = locked
+    ? correctForLeft.reduce((acc, correctNum, i) => acc + (userAns[i] === correctNum ? 1 : 0), 0)
+    : 0;
+
+  const refBtnLabel = state.referenceOpen ? '📖 Убрать справочник' : '📖 Подглянуть в справочник';
+
+  const inner = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevEgeRound()"'} title="Назад">←</button>
+      <div class="progress-text">Задание ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="mini-btn primary" onclick="toggleReference()">${refBtnLabel}</button>
+        <button class="mini-btn" onclick="restartReverse()" title="Реверс">🔁 Реверс</button>
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in" style="padding: 12px 14px; text-align:left;">
+      <div class="q-label" style="margin-bottom:6px;">
+        ${reverse ? 'Соотнеси ДЕЙСТВИЯ (А–Г) с ДЕЯТЕЛЯМИ (1–6)' : 'Соотнеси ДЕЯТЕЛЕЙ (А–Г) с их ДЕЛАМИ (1–6)'}
+      </div>
+    </div>
+    <div class="ege-table fade-in">${rowsHTML}</div>
+    <div class="ege-options-box fade-in">${rightListHTML}</div>
+    ${!locked ? `
+      <div style="text-align:center; margin-top: 8px;">
+        <button class="btn-primary" ${allFilled ? '' : 'disabled'} onclick="checkEgeRound()">Проверить</button>
+      </div>
+    ` : `
+      <div class="feedback ${correctCount === 4 ? 'fb-correct' : 'fb-wrong'}" style="text-align:center;">
+        ${correctCount === 4
+          ? `✅ Всё верно! (4/4)`
+          : `❌ Правильно: ${correctCount} из 4. Смотри подсветку.`}
+      </div>
+      <div style="text-align:center; margin-top: 14px;">
+        <button class="btn-primary" onclick="nextEgeRound()">${q.index < total - 1 ? 'Дальше →' : 'Завершить'}</button>
+      </div>
+    `}
+  `;
+
+  if (state.referenceOpen) {
+    app.innerHTML = `
+      <div class="ref-layout open">
+        <div class="ref-main">${inner}</div>
+        <aside class="ref-side">
+          <div class="ref-title">📖 Персоналии</div>
+          <div class="ref-sub">Деятели по эпохам</div>
+          <div>${characterReferenceTableHTML('')}</div>
+        </aside>
+      </div>
+    `;
+  } else {
+    app.innerHTML = inner;
+  }
+}
+function pickEgeNum(personIdx, num) {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const arr = q.answers[q.index];
+  arr[personIdx] = arr[personIdx] === num ? null : num;
+  renderCharacterEgeQuiz();
+}
+function checkEgeRound() {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const arr = q.answers[q.index];
+  if (arr.some(v => v === null)) return;
+  q.locked[q.index] = true;
+  renderCharacterEgeQuiz();
+}
+function nextEgeRound() {
+  const q = state.quiz;
+  if (q.index < q.rounds.length - 1) { q.index++; render(); }
+  else { state.screen = 'result'; render(); }
+}
+function prevEgeRound() {
+  const q = state.quiz;
+  if (q.index > 0) { q.index--; render(); }
+}
+
+/* --- ОТВЕТ (тесты, даты) --- */
+let advanceTimer = null;
+function answer(i) {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  q.answers[q.index] = i;
+  q.locked[q.index] = true;
+  renderQuiz();
+  clearTimeout(advanceTimer);
+  advanceTimer = setTimeout(() => {
+    if (q.index < q.questions.length - 1) { q.index++; render(); }
+    else { state.screen = 'result'; render(); }
+  }, 1200);
+}
+function checkTyped() {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const input = document.getElementById('dateInput');
+  if (!input) return;
+  const value = input.value.trim();
+  if (!value) { input.focus(); return; }
+  const correct = datesMatch(value, q.questions[q.index].item.date);
+  q.answers[q.index] = { value, correct };
+  q.locked[q.index] = true;
+  renderQuiz();
+}
+function nextTyped() {
+  const q = state.quiz;
+  if (q.index < q.questions.length - 1) { q.index++; render(); }
+  else { state.screen = 'result'; render(); }
+}
+function handleTypedEnter() {
+  const q = state.quiz;
+  if (q.locked[q.index]) nextTyped();
+  else checkTyped();
+}
+function prevQuestion() {
+  const q = state.quiz;
+  if (q.index > 0) { clearTimeout(advanceTimer); q.index--; render(); }
+}
+function quitQuiz() {
+  clearTimeout(advanceTimer);
+  state.quiz = null;
+  state.referenceOpen = false;
+  if (state.section === 'artasov' || state.section === 'olimpiadnik' || state.section === 'culture') {
+    state.screen = 'culture';
+  } else if (state.section === 'characters') {
+    if (state.characterMode === 'ege' && state.characterEgeLevel === 'hard') state.screen = 'characterEgePeriods';
+    else if (state.characterMode === 'ege') state.screen = 'characterEgeLevels';
+    else state.screen = 'characters';
+  } else {
+    state.screen = 'datePeriods';
+  }
+  render();
+}
+
+/* --- РЕЗУЛЬТАТ --- */
+function verdict(pct) {
+  if (pct === 100) return { emoji:'🏆', text:'Идеально! Ты — живая энциклопедия. Нестор-летописец записал бы тебя в свои хроники.' };
+  if (pct >= 85)  return { emoji:'🎯', text:'Блестяще! ЕГЭ уже нервно листает учебник и просит пощады.' };
+  if (pct >= 70)  return { emoji:'👍', text:'Хороший результат! Ещё немного — и ты станешь грозой всех историков.' };
+  if (pct >= 55)  return { emoji:'🤔', text:'Средне. Как Смутное время: не худшее, но и не лучшее. Есть куда расти.' };
+  if (pct >= 35)  return { emoji:'😅', text:'Так себе. Похоже, историю ты учил по мемам и пересказам одноклассника.' };
+  if (pct >= 15)  return { emoji:'🫠', text:'Мда… Князь Игорь тоже сначала неудачно сходил в поход. Но он исправился — и ты сможешь.' };
+  return { emoji:'💀', text:'Ты явно был занят чем-то более важным. Например, ничем. Начни заново — Рюрик тоже не сразу всё построил.' };
+}
+
+function renderResult() {
+  const q = state.quiz;
+  const v = verdict;
+  let correct, total, pct, vv, scoreDisplay, totalDisplay;
+
+  if (state.section === 'characters' && q.mode === 'ege') {
+    total = q.rounds.length;
+    correct = 0;
+    q.rounds.forEach((round, ri) => {
+      const ans = q.answers[ri];
+      const correctArr = q.reverse ? round.correctForActivity : round.correctForPerson;
+      let ok = true;
+      for (let i = 0; i < 4; i++) if (ans[i] !== correctArr[i]) { ok = false; break; }
+      if (ok) correct++;
+    });
+    pct = Math.round((correct / total) * 100);
+    vv = v(pct);
+    scoreDisplay = correct;
+    totalDisplay = total;
+  } else if (state.section === 'artasov') {
+    total = q.questions.length;
+    let score = 0;
+    q.questions.forEach((it, i) => {
+      if (q.answers[i] === it.correctIndex) {
+        score += q.peeked[i] ? 0.25 : 1;
+      }
+    });
+    correct = score;
+    pct = Math.round((score / total) * 100);
+    vv = v(pct);
+    scoreDisplay = Number.isInteger(score) ? score : score.toFixed(2);
+    totalDisplay = total;
+  } else if (state.section === 'olimpiadnik') {
+    total = q.questions.length;
+    correct = q.questions.reduce((acc, it, i) => {
+      const a = q.answers[i];
+      return acc + (a && a.correct ? 1 : 0);
+    }, 0);
+    pct = Math.round((correct / total) * 100);
+    vv = v(pct);
+    scoreDisplay = correct;
+    totalDisplay = total;
+  } else {
+    total = q.questions.length;
+    const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
+    correct = q.questions.reduce((acc, it, i) => {
+      const a = q.answers[i];
+      if (isTyping) return acc + (a && a.correct ? 1 : 0);
+      return acc + (a === it.correctIndex ? 1 : 0);
+    }, 0);
+    pct = Math.round((correct / total) * 100);
+    vv = v(pct);
+    scoreDisplay = correct;
+    totalDisplay = total;
+  }
+
+  const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
+  const noReverse = isTyping || state.section === 'olimpiadnik';
+
+  app.innerHTML = `
+    ${header()}
+    <div class="result fade-in">
+      <div class="emoji">${vv.emoji}</div>
+      <div class="score">${scoreDisplay} <span>/ ${totalDisplay}</span></div>
+      <div class="q-desc" style="margin-bottom:10px;">${pct}% верных ответов</div>
+      <div class="verdict">${vv.text}</div>
+      <div class="result-actions">
+        <button class="btn-primary" onclick="repeatQuiz()">Пройти заново</button>
+        ${!noReverse ? `<button class="btn-ghost" onclick="restartReverse()">🔁 В режиме реверса</button>` : ''}
+        <button class="btn-ghost" onclick="quitQuiz()">В меню</button>
+      </div>
+    </div>
+  `;
+}
+
+function repeatQuiz() {
+  if (state.section === 'dates') startDateQuiz(state.period);
+  else if (state.section === 'artasov') startArtasov();
+  else if (state.section === 'olimpiadnik') startOlimpiadnik();
+  else if (state.section === 'characters') {
+    if (state.characterMode === 'ege') startCharacterEge(state.period);
+    else startCharacterCards();
+  }
+}
+
+/* --- Глобальный Enter --- */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  if (state.screen !== 'quiz') return;
+  const q = state.quiz;
+  if (!q) return;
+  if (state.section === 'dates' && state.dateLevel === 'hard' && q.locked[q.index]) {
+    const tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag !== 'input') { e.preventDefault(); nextTyped(); }
+  }
+  if (state.section === 'olimpiadnik' && q.locked[q.index]) {
+    const tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag !== 'input') { e.preventDefault(); nextOlimpiadnik(); }
+  }
+});
+
+render();
+</script>
+</body>
+</html>
