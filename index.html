@@ -23,7 +23,9 @@
   .brand p { color: var(--muted); font-size: 14px; margin-top: 6px; font-style: italic; }
 
   .home-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  @media (max-width: 640px) { .home-cards { grid-template-columns: 1fr; } }
+  .home-cards.three-col { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 720px) { .home-cards.three-col { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .home-cards, .home-cards.three-col { grid-template-columns: 1fr; } }
   .home-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 18px; text-align: center; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; }
   .home-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 8px 20px rgba(26,58,92,.10); }
   .home-card .icon { font-size: 40px; margin-bottom: 10px; }
@@ -39,12 +41,14 @@
   .section-sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
 
   .period-list { display: flex; flex-direction: column; gap: 10px; }
-  .period-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color .15s, transform .15s; font-size: 15px; }
+  .period-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color .15s, transform .15s, background .15s; font-size: 15px; }
   .period-item:hover { border-color: var(--gold); transform: translateX(3px); }
   .period-item.disabled { opacity: .5; cursor: default; }
   .period-item.disabled:hover { border-color: var(--line); transform: none; }
   .period-item .count { color: var(--muted); font-size: 13px; font-family: sans-serif; }
+  .period-item.selected { border-color: var(--gold); background: #fdf8ea; }
   .soon-badge { background: #f0e9da; color: #8a7a55; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-family: sans-serif; }
+  .period-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--gold); }
 
   .level-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
   .level-cards.three { grid-template-columns: 1fr 1fr 1fr; }
@@ -58,6 +62,7 @@
   .level-card.easy .tag { background: #d7f0d8; color: #2e7d32; }
   .level-card.hard .tag { background: #f8d7da; color: #c62828; }
   .level-card.ref .tag { background: #f0e9da; color: #8a7a55; }
+  .level-card.war .tag { background: #e8e1f4; color: #5c3d8a; }
 
   .quiz-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
   .progress-text { color: var(--muted); font-size: 13px; font-family: sans-serif; }
@@ -65,8 +70,17 @@
   .mini-btn:hover { background: #f0e9da; border-color: var(--gold); }
   .mini-btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
   .mini-btn.primary:hover { background: #b3924d; }
-  .progress-bar { height: 6px; background: #e8e1d0; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+  .mini-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .progress-bar { height: 6px; background: #e8e1d0; border-radius: 3px; margin-bottom: 12px; overflow: hidden; }
   .progress-bar > div { height: 100%; background: var(--gold); width: 0%; transition: width .3s; }
+
+  /* Grid навигации по вопросам */
+  .q-grid { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; margin-bottom: 14px; padding: 8px; background: rgba(255,255,255,0.6); border: 1px solid var(--line); border-radius: 10px; }
+  .q-num { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: #fff; color: var(--muted); cursor: pointer; font-size: 11px; font-family: sans-serif; font-weight: 700; transition: all .12s; padding: 0; }
+  .q-num:hover { transform: scale(1.08); border-color: var(--gold); }
+  .q-num.q-num-current { background: rgba(201,169,97,0.18); color: var(--gold); border-color: var(--gold); opacity: 0.65; }
+  .q-num.q-num-correct { background: var(--green-bg); color: var(--green-br); border-color: var(--green-br); }
+  .q-num.q-num-wrong { background: var(--red-bg); color: var(--red-br); border-color: var(--red-br); }
 
   .question-box { background: var(--card); border: 2px solid var(--blue); border-radius: 14px; padding: 22px 20px; margin-bottom: 18px; text-align: center; }
   .question-box .q-label { color: var(--gold); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; font-family: sans-serif; }
@@ -152,6 +166,25 @@
   .ref-search:focus { outline: none; border-color: var(--gold); }
 
   .peeked-badge { background: #f0e9da; color: #8a7a55; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-family: sans-serif; }
+
+  /* Хронология */
+  .chrono-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .chrono-item { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 14px 18px; font-size: 15px; display: flex; align-items: center; gap: 12px; cursor: grab; transition: border-color .12s, background .12s, transform .12s; }
+  .chrono-item:hover { border-color: var(--gold); }
+  .chrono-item.dragging { opacity: 0.35; }
+  .chrono-item.drop-target { border-color: var(--gold); background: #fdf8ea; transform: scale(1.01); }
+  .chrono-item.chrono-correct { background: var(--green-bg); border-color: var(--green-br); }
+  .chrono-item.chrono-wrong { background: var(--red-bg); border-color: var(--red-br); }
+  .chrono-handle { color: var(--muted); font-family: sans-serif; font-size: 18px; user-select: none; flex-shrink: 0; }
+  .chrono-body { flex: 1; }
+  .chrono-date-hint { color: var(--muted); font-size: 12px; font-family: sans-serif; margin-top: 2px; }
+  .chrono-arrows { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .chrono-arrow { width: 28px; height: 22px; border-radius: 5px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 11px; color: var(--blue); padding: 0; }
+  .chrono-arrow:hover:not(:disabled) { border-color: var(--gold); }
+  .chrono-arrow:disabled { opacity: 0.3; cursor: default; }
+
+  .check-row { display: flex; gap: 4px; align-items: center; }
+  .check-row input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--gold); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -159,7 +192,7 @@
 
 <script>
 /* =========================================================
-   1. КУЛЬТУРА — СТРУКТУРИРОВАННЫЙ СПРАВОЧНИК
+   1. КУЛЬТУРА — СТРУКТУРИРОВАННЫЙ СПРАВОЧНИК (НЕ ТРОГАЕМ)
    ========================================================= */
 const CULTURE_DATA = [
   { name:'Десятинная церковь', city:'Киев', year:'996', ruler:'Владимир Святой', author:'', desc:'Первый каменный храм Киевской Руси, разрушен монголами в 1240 г.' },
@@ -247,7 +280,7 @@ function getYearFact(m) { return `Создан в ${m.year}`; }
 function getDescFact(m) { return m.desc; }
 
 /* =========================================================
-   2. ПЕРСОНАЖИ
+   2. ПЕРСОНАЖИ (НЕ ТРОГАЕМ)
    ========================================================= */
 const CHARACTERS = [
   { name:'Рюрик', period:'Древняя Русь (862–1132)', action:'Призвание на княжение в Новгород (862)' },
@@ -374,9 +407,25 @@ const CHARACTERS = [
 ];
 
 /* =========================================================
-   3. ДАТЫ — ИСТОРИЯ РОССИИ (не трогаем)
+   3. ДАТЫ — ИСТОРИЯ РОССИИ
    ========================================================= */
+const RU_DATE_PERIODS = [
+  'Древняя Русь (862–1132)',
+  'Удельная раздробленность и Орда (1132–1480)',
+  'Московское государство (1480–1598)',
+  'Смутное время (1598–1618)',
+  'Бунташный век (1618–1682)',
+  'Становление империей (1682–1725)',
+  'Дворцовые перевороты (1725–1762)',
+  'Эпоха просвещённого абсолютизма и реформ (1762–1825)',
+  'Имперская Россия между двумя рубежами (1825–1905)',
+  'Первая мировая война (1914–1917)',
+  'Революции 1917 года и кризисы Временного правительства (1917)',
+  'Гражданская война (1918–1922)'
+];
+
 const RUSSIAN_DATES = [
+  // Древняя Русь
   { date:'862–879', event:'Правление Рюрика', period:'Древняя Русь (862–1132)' },
   { date:'879–912', event:'Правление Олега', period:'Древняя Русь (862–1132)' },
   { date:'882', event:'Убийство Аскольда и Дира, объединение Новгорода и Киева', period:'Древняя Русь (862–1132)' },
@@ -403,6 +452,7 @@ const RUSSIAN_DATES = [
   { date:'1113–1125', event:'Правление Владимира Мономаха', period:'Древняя Русь (862–1132)' },
   { date:'1113', event:'Первая редакция «Повести временных лет»', period:'Древняя Русь (862–1132)' },
   { date:'1125–1132', event:'Правление Мстислава Великого', period:'Древняя Русь (862–1132)' },
+  // Удельная раздробленность
   { date:'1125–1157', event:'Правление Юрия Долгорукого', period:'Удельная раздробленность и Орда (1132–1480)' },
   { date:'1147', event:'Первое упоминание Москвы в летописи', period:'Удельная раздробленность и Орда (1132–1480)' },
   { date:'1157–1174', event:'Правление Андрея Боголюбского', period:'Удельная раздробленность и Орда (1132–1480)' },
@@ -440,6 +490,7 @@ const RUSSIAN_DATES = [
   { date:'1425–1462', event:'Правление Василия II', period:'Удельная раздробленность и Орда (1132–1480)' },
   { date:'1425–1453', event:'Феодальная (междоусобная) война', period:'Удельная раздробленность и Орда (1132–1480)' },
   { date:'1448', event:'Автокефалия русской церкви', period:'Удельная раздробленность и Орда (1132–1480)' },
+  // Московское государство
   { date:'1462–1505', event:'Правление Ивана III Великого', period:'Московское государство (1480–1598)' },
   { date:'1471', event:'Битва на реке Шелони', period:'Московское государство (1480–1598)' },
   { date:'1478', event:'Присоединение Новгорода', period:'Московское государство (1480–1598)' },
@@ -471,6 +522,7 @@ const RUSSIAN_DATES = [
   { date:'1591', event:'Смерть царевича Дмитрия в Угличе', period:'Московское государство (1480–1598)' },
   { date:'1586', event:'Основание Тюмени и Воронежа', period:'Московское государство (1480–1598)' },
   { date:'1587', event:'Основание Тобольска', period:'Московское государство (1480–1598)' },
+  // Смутное время
   { date:'1598–1605', event:'Правление Бориса Годунова', period:'Смутное время (1598–1618)' },
   { date:'1601–1603', event:'Голод в России (неудачные действия властей)', period:'Смутное время (1598–1618)' },
   { date:'1598', event:'Земский собор, избравший Бориса Годунова на царство', period:'Смутное время (1598–1618)' },
@@ -488,6 +540,7 @@ const RUSSIAN_DATES = [
   { date:'1613', event:'Земский собор, избравший Михаила Фёдоровича Романова', period:'Смутное время (1598–1618)' },
   { date:'1617', event:'Столбовский мир со Швецией', period:'Смутное время (1598–1618)' },
   { date:'1618', event:'Деулинское перемирие с Речью Посполитой', period:'Смутное время (1598–1618)' },
+  // Бунташный век
   { date:'1613–1645', event:'Правление Михаила Фёдоровича Романова', period:'Бунташный век (1618–1682)' },
   { date:'1632–1634', event:'Смоленская война', period:'Бунташный век (1618–1682)' },
   { date:'1634', event:'Поляновский мир; создание полков нового строя', period:'Бунташный век (1618–1682)' },
@@ -513,6 +566,7 @@ const RUSSIAN_DATES = [
   { date:'1677–1681', event:'Русско-турецкая война, Чигиринские походы', period:'Бунташный век (1618–1682)' },
   { date:'1681', event:'Бахчисарайский мир', period:'Бунташный век (1618–1682)' },
   { date:'1679', event:'Замена посошной подати подворной', period:'Бунташный век (1618–1682)' },
+  // Становление империей
   { date:'1682', event:'Стрелецкий бунт (Софья, Иван и Пётр)', period:'Становление империей (1682–1725)' },
   { date:'1682–1725', event:'Правление Петра I', period:'Становление империей (1682–1725)' },
   { date:'1686', event:'Вечный мир с Польшей', period:'Становление империей (1682–1725)' },
@@ -546,6 +600,7 @@ const RUSSIAN_DATES = [
   { date:'1721', event:'Ништадтский мир', period:'Становление империей (1682–1725)' },
   { date:'1722–1723', event:'Персидский поход', period:'Становление империей (1682–1725)' },
   { date:'1723', event:'Петербургский мир (южное побережье Каспия)', period:'Становление империей (1682–1725)' },
+  // Дворцовые перевороты
   { date:'1725–1727', event:'Правление Екатерины I', period:'Дворцовые перевороты (1725–1762)' },
   { date:'1726', event:'Создание Верховного тайного совета (А. Меншиков)', period:'Дворцовые перевороты (1725–1762)' },
   { date:'1727', event:'Свержение Меншикова и перенос столицы в Москву', period:'Дворцовые перевороты (1725–1762)' },
@@ -569,6 +624,7 @@ const RUSSIAN_DATES = [
   { date:'1762', event:'Петербургский сепаратный мир с Пруссией', period:'Дворцовые перевороты (1725–1762)' },
   { date:'1761–1762', event:'Правление Петра III', period:'Дворцовые перевороты (1725–1762)' },
   { date:'1762', event:'Манифест о вольности дворянства', period:'Дворцовые перевороты (1725–1762)' },
+  // Просвещённый абсолютизм
   { date:'1762–1796', event:'Правление Екатерины II', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
   { date:'1763', event:'Реформа Сената', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
   { date:'1764', event:'Секуляризация церковных земель', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
@@ -612,6 +668,7 @@ const RUSSIAN_DATES = [
   { date:'1814', event:'Взятие Парижа', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
   { date:'1814–1815', event:'Венский конгресс', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
   { date:'1815', event:'Создание Священного союза (Австрия, Россия, Пруссия)', period:'Эпоха просвещённого абсолютизма и реформ (1762–1825)' },
+  // Имперская Россия между двумя рубежами
   { date:'1825–1855', event:'Правление Николая I', period:'Имперская Россия между двумя рубежами (1825–1905)' },
   { date:'14 декабря 1825', event:'Восстание декабристов', period:'Имперская Россия между двумя рубежами (1825–1905)' },
   { date:'1826', event:'«Чугунный» цензурный устав; создание Третьего отделения', period:'Имперская Россия между двумя рубежами (1825–1905)' },
@@ -664,22 +721,51 @@ const RUSSIAN_DATES = [
   { date:'1906', event:'Работа I Государственной думы', period:'Имперская Россия между двумя рубежами (1825–1905)' },
   { date:'1907', event:'Работа II Государственной думы', period:'Имперская Россия между двумя рубежами (1825–1905)' },
   { date:'3 июня 1907', event:'Роспуск Думы, «третьеиюньский переворот»', period:'Имперская Россия между двумя рубежами (1825–1905)' },
-  { date:'1914', event:'Вступление России в Первую мировую войну', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'1915', event:'Николай II принял звание Верховного главнокомандующего', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'сентябрь 1914', event:'Восточно-Прусская операция', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'май – 7 сентября 1916', event:'Брусиловский прорыв', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'23 февраля (8 марта) 1917', event:'Начало массовых демонстраций в Петрограде', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'27 февраля (12 марта) 1917', event:'Вооружённое восстание; создание Временного комитета Госдумы и Петросовета', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'1 марта 1917', event:'Издание Приказа № 1 Петроградским Советом', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'2 марта 1917', event:'Отречение Николая II от престола', period:'Первая мировая и крушение империи (1914–1917)' },
-  { date:'3 марта 1917', event:'Отказ Михаила Александровича от власти до решения Учредительного собрания', period:'Первая мировая и крушение империи (1914–1917)' }
+  // ПМВ
+  { date:'1 августа 1914', event:'Вступление России в Первую мировую войну', period:'Первая мировая война (1914–1917)' },
+  { date:'1914', event:'Восточно-Прусская и Галицийская операции (битва на Марне)', period:'Первая мировая война (1914–1917)' },
+  { date:'июнь-сентябрь 1915', event:'«Великое отступление»', period:'Первая мировая война (1914–1917)' },
+  { date:'январь-февраль 1916', event:'Эрзурумская операция', period:'Первая мировая война (1914–1917)' },
+  { date:'май-июль 1916', event:'Брусиловский прорыв', period:'Первая мировая война (1914–1917)' },
+  { date:'июль 1917', event:'Июльское наступление Временного правительства', period:'Первая мировая война (1914–1917)' },
+  // Революции 1917
+  { date:'23 февраля (8 марта) 1917', event:'Начало забастовок в Петрограде', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'26 февраля 1917', event:'Роспуск Государственной Думы', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'27 февраля 1917', event:'Образование Петроградского совета и Временного комитета Гос. думы', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'2 (15) марта 1917', event:'Отречение Николая II', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'3 (16) марта 1917', event:'Отречение князя Михаила Александровича, полная ликвидация монархии и власть Временного правительства', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'18 апреля 1917', event:'Восстания из-за ноты Милюкова (апрельский кризис)', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'3-24 июня 1917', event:'I Всероссийский съезд Советов', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'3-5 июля 1917', event:'Признание автономии Центральной Рады, провал наступления (июльский кризис)', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'23-30 августа 1917', event:'Корниловский мятеж (августовский кризис)', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'12 октября 1917', event:'Создание Военно-революционного комитета (ВРК) при Петроградском совете', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'24-25 октября 1917', event:'Захват стратегических пунктов в Петрограде и свержение Временного правительства', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  { date:'25-26 октября 1917', event:'«Декрет о мире» и «Декрет о земле»', period:'Революции 1917 года и кризисы Временного правительства (1917)' },
+  // Гражданская война
+  { date:'25 мая 1918', event:'Выступление (мятеж) Чехословацкого корпуса от Пензы до Владивостока, начало Гражданской войны', period:'Гражданская война (1918–1922)' },
+  { date:'6 июля 1918', event:'Убийство посла Германии в России, начало мятежа левых эсеров в Москве', period:'Гражданская война (1918–1922)' },
+  { date:'7 июля 1918', event:'Разгром мятежа левых эсеров', period:'Гражданская война (1918–1922)' },
+  { date:'16 июля 1918', event:'Расстрел царской семьи в Екатеринбурге в доме инженера Ипатьева', period:'Гражданская война (1918–1922)' },
+  { date:'5 сентября 1918', event:'Постановление СНК об обеспечении тыла путём террора', period:'Гражданская война (1918–1922)' },
+  { date:'сентябрь-октябрь 1918', event:'Взятие войсками Красной Армии Казани, Симбирска, Самары', period:'Гражданская война (1918–1922)' },
+  { date:'18 ноября 1918', event:'Переворот под руководством адмирала Александра Колчака, свержение эсеро-меньшевистской Директории (Омской Директории); Колчак — Верховный правитель России', period:'Гражданская война (1918–1922)' },
+  { date:'23 ноября 1918', event:'Начало англо-французской интервенции на побережье Чёрного моря', period:'Гражданская война (1918–1922)' },
+  { date:'май, сентябрь-октябрь 1919', event:'Неудачная попытка войск Северо-Западной армии Николая Юденича овладеть Петроградом', period:'Гражданская война (1918–1922)' },
+  { date:'21 июня 1919 — 7 января 1920', event:'Разгром армии Александра Колчака, восстановление власти в Сибири и на Дальнем Востоке', period:'Гражданская война (1918–1922)' },
+  { date:'11 октября — 18 ноября 1919', event:'Контрнаступление Красной Армии против Деникина; остатки деникинских войск укрылись в Крыму', period:'Гражданская война (1918–1922)' },
+  { date:'1920-1921', event:'Антоновщина: крестьянское антибольшевистское восстание на Тамбовщине', period:'Гражданская война (1918–1922)' },
+  { date:'1920-1921', event:'Советско-польская война', period:'Гражданская война (1918–1922)' },
+  { date:'28 октября — 17 ноября 1920', event:'Разгром в Крыму Русской армии Петра Врангеля войсками Южного фронта под началом Михаила Фрунзе', period:'Гражданская война (1918–1922)' },
+  { date:'7-11 ноября 1920', event:'Штурм и взятие Перекопа Красной Армией, начало эвакуации белогвардейцев из Крыма', period:'Гражданская война (1918–1922)' },
+  { date:'28 февраля — 18 марта 1921', event:'Кронштадтское восстание солдат и матросов, подавлено армией под началом Михаила Тухачевского', period:'Гражданская война (1918–1922)' },
+  { date:'18 марта 1921', event:'Рижский мирный договор между Советской Россией и Польшей. Западная Украина и Западная Белоруссия отошли к Польше', period:'Гражданская война (1918–1922)' },
+  { date:'15 ноября 1922', event:'Вхождение ДВР (Дальневосточной республики) в состав РСФСР, фактическое окончание Гражданской войны', period:'Гражданская война (1918–1922)' }
 ];
 
 /* =========================================================
-   4. ДАТЫ — ВСЕОБЩАЯ ИСТОРИЯ (расширено)
+   4. ДАТЫ — ВСЕОБЩАЯ ИСТОРИЯ (не трогаем)
    ========================================================= */
 const WORLD_DATES = [
-  // Раннее Средневековье
   { date:'476', event:'Падение Западной Римской империи', period:'Раннее Средневековье (V–XI века)' },
   { date:'486', event:'Возникновение государства франков', period:'Раннее Средневековье (V–XI века)' },
   { date:'527–565', event:'Правление Юстиниана I в Византийской империи', period:'Раннее Средневековье (V–XI века)' },
@@ -689,8 +775,6 @@ const WORLD_DATES = [
   { date:'962', event:'Образование Священной Римской империи', period:'Раннее Средневековье (V–XI века)' },
   { date:'1054', event:'Разделение христианской церкви', period:'Раннее Средневековье (V–XI века)' },
   { date:'1066', event:'Битва при Гастингсе, Нормандское завоевание Англии', period:'Раннее Средневековье (V–XI века)' },
-
-  // Зрелое Средневековье
   { date:'1096–1270', event:'Крестовые походы', period:'Зрелое Средневековье (XI–XV века)' },
   { date:'1204', event:'Захват Константинополя крестоносцами', period:'Зрелое Средневековье (XI–XV века)' },
   { date:'1215', event:'Принятие Великой хартии вольности', period:'Зрелое Средневековье (XI–XV века)' },
@@ -703,16 +787,12 @@ const WORLD_DATES = [
   { date:'1419–1434', event:'Гуситские войны', period:'Зрелое Средневековье (XI–XV века)' },
   { date:'1445', event:'Изобретение книгопечатания Гуттенбергом', period:'Зрелое Средневековье (XI–XV века)' },
   { date:'1453', event:'Падение Византийской империи', period:'Зрелое Средневековье (XI–XV века)' },
-
-  // Позднее Средневековье
   { date:'1455–1485', event:'Война Алой и Белой розы в Англии', period:'Позднее Средневековье (XV век)' },
   { date:'1461–1483', event:'Правление Людовика XI во Франции', period:'Позднее Средневековье (XV век)' },
   { date:'1485–1509', event:'Правление Генриха VII в Англии', period:'Позднее Средневековье (XV век)' },
   { date:'1492', event:'Завершение Реконкисты на Пиренейском полуострове', period:'Позднее Средневековье (XV век)' },
   { date:'1492', event:'Открытие Америки Христофором Колумбом', period:'Позднее Средневековье (XV век)' },
   { date:'1497–1499', event:'Открытие Васко да Гамой морского пути в Индию', period:'Позднее Средневековье (XV век)' },
-
-  // Реформация
   { date:'1517', event:'Выступление М. Лютера с 95 тезисами, начало Реформации в Германии', period:'Реформация и религиозные войны (XVI век)' },
   { date:'1519–1522', event:'Кругосветное плавание экспедиции Ф. Магеллана', period:'Реформация и религиозные войны (XVI век)' },
   { date:'1521', event:'Вормсский рейхстаг. Осуждение М. Лютера', period:'Реформация и религиозные войны (XVI век)' },
@@ -725,8 +805,6 @@ const WORLD_DATES = [
   { date:'1579', event:'Утрехтская уния', period:'Реформация и религиозные войны (XVI век)' },
   { date:'1588', event:'Разгром Англией Непобедимой армады', period:'Реформация и религиозные войны (XVI век)' },
   { date:'1598', event:'Нантский эдикт Генриха IV во Франции', period:'Реформация и религиозные войны (XVI век)' },
-
-  // Абсолютизм и революции
   { date:'1618–1648', event:'Тридцатилетняя война', period:'Абсолютизм и революции (XVII век)' },
   { date:'1624–1642', event:'Деятельность кардинала Ришелье на посту первого министра Франции', period:'Абсолютизм и революции (XVII век)' },
   { date:'1640', event:'Начало деятельности Долгого парламента в Англии', period:'Абсолютизм и революции (XVII век)' },
@@ -741,9 +819,14 @@ const WORLD_DATES = [
   { date:'1688', event:'«Славная революция» в Англии', period:'Абсолютизм и революции (XVII век)' }
 ];
 
-/* =========================================================
-   5. ПЕРИОДЫ
-   ========================================================= */
+const WORLD_PERIODS = [
+  'Раннее Средневековье (V–XI века)',
+  'Зрелое Средневековье (XI–XV века)',
+  'Позднее Средневековье (XV век)',
+  'Реформация и религиозные войны (XVI век)',
+  'Абсолютизм и революции (XVII век)'
+];
+
 const RU_PERIODS = [
   'Древняя Русь (862–1132)',
   'Удельная раздробленность и Орда (1132–1480)',
@@ -756,26 +839,69 @@ const RU_PERIODS = [
   'Постсоветская Россия (1991 – н.в.)'
 ];
 
-const RU_DATE_PERIODS = [
-  'Древняя Русь (862–1132)',
-  'Удельная раздробленность и Орда (1132–1480)',
-  'Московское государство (1480–1598)',
-  'Смутное время (1598–1618)',
-  'Бунташный век (1618–1682)',
-  'Становление империей (1682–1725)',
-  'Дворцовые перевороты (1725–1762)',
-  'Эпоха просвещённого абсолютизма и реформ (1762–1825)',
-  'Имперская Россия между двумя рубежами (1825–1905)',
-  'Первая мировая и крушение империи (1914–1917)'
+/* =========================================================
+   5. ВОЙНА И МИР
+   ========================================================= */
+const WAR_PEACE_DATA = [
+  { war:'Ливонская война', years:'1558–1583', peace:'Ям-Запольский мир 1582', commanders:'А.М. Курбский, М.И. Воротынский', outcome:'Потеря Ливонии, возврат русских городов' },
+  { war:'Русско-польская война 1654–1667', years:'1654–1667', peace:'Андрусовское перемирие 1667', commanders:'Б. Хмельницкий, А.Н. Трубецкой', outcome:'Возврат Смоленска и Левобережной Украины' },
+  { war:'Русско-шведская война 1656–1658', years:'1656–1658', peace:'Кардисский мир 1661', commanders:'А.Н. Трубецкой, Г.Г. Ромодановский', outcome:'Сохранение границ' },
+  { war:'Северная война', years:'1700–1721', peace:'Ништадтский мир 1721', commanders:'Пётр I, Карл XII', outcome:'Выход к Балтийскому морю' },
+  { war:'Прутский поход', years:'1711', peace:'Прутский мир 1711', commanders:'Пётр I', outcome:'Потеря Азова' },
+  { war:'Русско-турецкая война 1735–1739', years:'1735–1739', peace:'Белградский мир 1739', commanders:'Б.К. Миних', outcome:'Возвращение Азова' },
+  { war:'Русско-шведская война 1741–1743', years:'1741–1743', peace:'Абоский мир 1743', commanders:'П.П. Ласси', outcome:'Часть Финляндии к России' },
+  { war:'Семилетняя война', years:'1756–1763', peace:'Петербургский мир 1762', commanders:'П.С. Салтыков, Фридрих II', outcome:'Возврат завоёванных земель' },
+  { war:'Русско-турецкая война 1768–1774', years:'1768–1774', peace:'Кючук-Кайнарджийский мир 1774', commanders:'П.А. Румянцев, А.В. Суворов', outcome:'Выход к Чёрному морю' },
+  { war:'Русско-турецкая война 1787–1791', years:'1787–1791', peace:'Ясский мир 1791', commanders:'А.В. Суворов, Ф.Ф. Ушаков', outcome:'Присоединение Крыма' },
+  { war:'Русско-шведская война 1788–1790', years:'1788–1790', peace:'Верельский мир 1790', commanders:'В.Я. Чичагов', outcome:'Сохранение границ' },
+  { war:'Русско-иранская война 1804–1813', years:'1804–1813', peace:'Гюлистанский мир 1813', commanders:'П.С. Котляревский', outcome:'Присоединение Грузии и Северного Азербайджана' },
+  { war:'Русско-турецкая война 1806–1812', years:'1806–1812', peace:'Бухарестский мир 1812', commanders:'М.И. Кутузов', outcome:'Присоединение Бессарабии' },
+  { war:'Русско-шведская война 1808–1809', years:'1808–1809', peace:'Фридрихсгамский мир 1809', commanders:'М.Б. Барклай-де-Толли', outcome:'Присоединение Финляндии' },
+  { war:'Отечественная война 1812', years:'1812', peace:'Парижский мир 1814', commanders:'М.И. Кутузов, П.И. Багратион', outcome:'Изгнание Наполеона из России' },
+  { war:'Русско-иранская война 1826–1828', years:'1826–1828', peace:'Туркманчайский мир 1828', commanders:'И.Ф. Паскевич', outcome:'Присоединение Эривани' },
+  { war:'Русско-турецкая война 1828–1829', years:'1828–1829', peace:'Адрианопольский мир 1829', commanders:'И.Ф. Паскевич, И.И. Дибич', outcome:'Автономия Греции' },
+  { war:'Кавказская война', years:'1817–1864', peace:'Пленение Шамиля 1859', commanders:'А.П. Ермолов, А.И. Барятинский', outcome:'Присоединение Кавказа' },
+  { war:'Крымская война', years:'1853–1856', peace:'Парижский мир 1856', commanders:'П.С. Нахимов, В.А. Корнилов', outcome:'Нейтралитет Чёрного моря' },
+  { war:'Русско-турецкая война 1877–1878', years:'1877–1878', peace:'Сан-Стефанский мир 1878', commanders:'М.Д. Скобелев, И.В. Гурко', outcome:'Освобождение Болгарии' },
+  { war:'Русско-японская война', years:'1904–1905', peace:'Портсмутский мир 1905', commanders:'С.О. Макаров, А.Н. Куропаткин', outcome:'Потеря Южного Сахалина' },
+  { war:'Первая мировая война', years:'1914–1918', peace:'Брестский мир 1918', commanders:'А.А. Брусилов, М.В. Алексеев', outcome:'Выход Советской России из войны' },
+  { war:'Советско-польская война', years:'1919–1920', peace:'Рижский мир 1921', commanders:'М.Н. Тухачевский', outcome:'Западная Украина и Белоруссия к Польше' }
 ];
 
-const WORLD_PERIODS = [
-  'Раннее Средневековье (V–XI века)',
-  'Зрелое Средневековье (XI–XV века)',
-  'Позднее Средневековье (XV век)',
-  'Реформация и религиозные войны (XVI век)',
-  'Абсолютизм и революции (XVII век)'
-];
+function extractFirstYear(s) {
+  const m = String(s).match(/\d{3,4}/);
+  return m ? parseInt(m[0]) : null;
+}
+
+function getWarFact(war, criterion) {
+  switch (criterion) {
+    case 'dates': return war.years;
+    case 'peace': return war.peace;
+    case 'commanders': return war.commanders;
+    case 'outcome': return war.outcome;
+    default: return war.outcome;
+  }
+}
+
+function getWarCriterionLabel(criterion) {
+  switch (criterion) {
+    case 'dates': return 'годами';
+    case 'peace': return 'мирными договорами';
+    case 'commanders': return 'полководцами';
+    case 'outcome': return 'итогами';
+    default: return 'итогами';
+  }
+}
+
+function getWarCriterionTitle(criterion) {
+  switch (criterion) {
+    case 'dates': return '📅 По датам';
+    case 'peace': return '📜 По мирным договорам';
+    case 'commanders': return '⚔️ По полководцам';
+    case 'outcome': return '🏆 По итогам';
+    default: return '🏆 По итогам';
+  }
+}
 
 /* =========================================================
    6. УТИЛИТЫ
@@ -856,9 +982,12 @@ let state = {
   period: null,
   characterMode: null,
   characterEgeLevel: null,
+  warCriterion: null,
+  chronoLevel: null,
   quiz: null,
   referenceOpen: false,
-  referenceQuery: ''
+  referenceQuery: '',
+  selectedPeriods: null
 };
 
 /* =========================================================
@@ -872,7 +1001,6 @@ function referenceTableHTML(query) {
                  || (m.author && m.author.toLowerCase().includes(q))
                  || m.year.includes(q) || m.desc.toLowerCase().includes(q))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-
   const rowsHTML = rows.map(m => `
     <tr>
       <td class="name">${esc(m.name)}</td>
@@ -882,12 +1010,9 @@ function referenceTableHTML(query) {
       <td>${esc(m.desc)}</td>
     </tr>
   `).join('');
-
   return `
     <table class="ref-table">
-      <thead>
-        <tr><th>Памятник</th><th>Год</th><th>Город</th><th>Создатель / правитель</th><th>Особенность</th></tr>
-      </thead>
+      <thead><tr><th>Памятник</th><th>Год</th><th>Город</th><th>Создатель / правитель</th><th>Особенность</th></tr></thead>
       <tbody>${rowsHTML || '<tr><td colspan="5" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
     </table>
   `;
@@ -899,22 +1024,58 @@ function worldReferenceTableHTML(query) {
     !q || d.event.toLowerCase().includes(q) || d.date.includes(q) || d.period.toLowerCase().includes(q)
   );
   const groups = {};
-  filtered.forEach(d => {
-    if (!groups[d.period]) groups[d.period] = [];
-    groups[d.period].push(d);
-  });
+  filtered.forEach(d => { if (!groups[d.period]) groups[d.period] = []; groups[d.period].push(d); });
   let rows = '';
   WORLD_PERIODS.forEach(p => {
     if (groups[p] && groups[p].length) {
       rows += `<tr><td colspan="2" class="ref-period">${esc(p)}</td></tr>`;
-      groups[p].forEach(d => {
-        rows += `<tr><td class="meta">${esc(d.date)}</td><td>${esc(d.event)}</td></tr>`;
-      });
+      groups[p].forEach(d => { rows += `<tr><td class="meta">${esc(d.date)}</td><td>${esc(d.event)}</td></tr>`; });
     }
   });
   return `<table class="ref-table">
     <thead><tr><th>Дата</th><th>Событие</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="2" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
+  </table>`;
+}
+
+function russianReferenceTableHTML(query) {
+  const q = (query || '').toLowerCase().trim();
+  const filtered = RUSSIAN_DATES.filter(d =>
+    !q || d.event.toLowerCase().includes(q) || d.date.includes(q) || d.period.toLowerCase().includes(q)
+  );
+  const groups = {};
+  filtered.forEach(d => { if (!groups[d.period]) groups[d.period] = []; groups[d.period].push(d); });
+  let rows = '';
+  RU_DATE_PERIODS.forEach(p => {
+    if (groups[p] && groups[p].length) {
+      rows += `<tr><td colspan="2" class="ref-period">${esc(p)}</td></tr>`;
+      groups[p].forEach(d => { rows += `<tr><td class="meta">${esc(d.date)}</td><td>${esc(d.event)}</td></tr>`; });
+    }
+  });
+  return `<table class="ref-table">
+    <thead><tr><th>Дата</th><th>Событие</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="2" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
+  </table>`;
+}
+
+function warReferenceTableHTML(query) {
+  const q = (query || '').toLowerCase().trim();
+  const filtered = WAR_PEACE_DATA.filter(w =>
+    !q || w.war.toLowerCase().includes(q) || w.years.includes(q) || w.peace.toLowerCase().includes(q)
+         || w.commanders.toLowerCase().includes(q) || w.outcome.toLowerCase().includes(q)
+  );
+  const rowsHTML = filtered.map(w => `
+    <tr>
+      <td class="name">${esc(w.war)}</td>
+      <td class="meta">${esc(w.years)}</td>
+      <td>${esc(w.peace)}</td>
+      <td>${esc(w.commanders)}</td>
+      <td>${esc(w.outcome)}</td>
+    </tr>
+  `).join('');
+  return `<table class="ref-table">
+    <thead><tr><th>Война</th><th>Годы</th><th>Мир</th><th>Полководцы</th><th>Итог</th></tr></thead>
+    <tbody>${rowsHTML || '<tr><td colspan="5" style="text-align:center;color:#6b6b6b;">Ничего не найдено</td></tr>'}</tbody>
   </table>`;
 }
 
@@ -924,17 +1085,12 @@ function characterReferenceTableHTML(query) {
     !q || c.name.toLowerCase().includes(q) || c.action.toLowerCase().includes(q) || c.period.toLowerCase().includes(q)
   );
   const groups = {};
-  filtered.forEach(c => {
-    if (!groups[c.period]) groups[c.period] = [];
-    groups[c.period].push(c);
-  });
+  filtered.forEach(c => { if (!groups[c.period]) groups[c.period] = []; groups[c.period].push(c); });
   let rows = '';
   RU_PERIODS.forEach(p => {
     if (groups[p] && groups[p].length) {
       rows += `<tr><td colspan="2" class="ref-period">${esc(p)}</td></tr>`;
-      groups[p].forEach(c => {
-        rows += `<tr><td class="name">${esc(c.name)}</td><td>${esc(c.action)}</td></tr>`;
-      });
+      groups[p].forEach(c => { rows += `<tr><td class="name">${esc(c.name)}</td><td>${esc(c.action)}</td></tr>`; });
     }
   });
   return `<table class="ref-table">
@@ -946,9 +1102,16 @@ function characterReferenceTableHTML(query) {
 /* =========================================================
    9. ГЕНЕРАТОРЫ
    ========================================================= */
-function buildDateQuiz(source, period, reverse, level) {
+function buildDateQuiz(source, periods, level) {
   const data = source === 'world' ? WORLD_DATES : RUSSIAN_DATES;
-  let pool = period === 'all' ? data : data.filter(d => d.period === period);
+  let pool;
+  if (periods === 'all' || (Array.isArray(periods) && periods.length === 0) || periods === null) {
+    pool = data;
+  } else if (Array.isArray(periods)) {
+    pool = data.filter(d => periods.includes(d.period));
+  } else {
+    pool = data.filter(d => d.period === periods);
+  }
   if (level === 'hard') pool = pool.filter(d => isTypeable(d.date));
   if (pool.length < 1) pool = data.filter(d => level === 'hard' ? isTypeable(d.date) : true);
 
@@ -963,7 +1126,8 @@ function buildDateQuiz(source, period, reverse, level) {
       distractors = distractors.concat(others.slice(0, 2 - distractors.length));
     }
     const options = shuffle([item, ...distractors]);
-    return { item, options, correctIndex: options.indexOf(item), reverse };
+    const qReverse = Math.random() < 0.5; // случайно: дата→событие или событие→дата
+    return { item, options, correctIndex: options.indexOf(item), reverse: qReverse };
   });
 }
 
@@ -974,7 +1138,6 @@ function buildArtasovQuiz() {
     if (getCreatorFact(m)) available.push('creator');
     available.push('year', 'city', 'desc');
     const type = available[Math.floor(Math.random() * available.length)];
-
     let correctText = '';
     switch (type) {
       case 'creator': correctText = getCreatorFact(m).text; break;
@@ -982,7 +1145,6 @@ function buildArtasovQuiz() {
       case 'city':    correctText = getCityFact(m); break;
       case 'desc':    correctText = getDescFact(m); break;
     }
-
     const others = shuffle(CULTURE_DATA.filter(x => x.name !== m.name));
     const distractors = [];
     for (const o of others) {
@@ -1009,7 +1171,6 @@ function buildArtasovQuiz() {
       }
       if (f) distractors.push({ text: f, monument: o });
     }
-
     const correctOpt = { text: correctText, monument: m };
     const options = shuffle([correctOpt, ...distractors]);
     return { monument: m, type, fact: correctText, options, correctIndex: options.indexOf(correctOpt) };
@@ -1025,22 +1186,16 @@ function buildOlimpiadnikQuiz() {
       const answer = isRuler ? m.ruler : m.author;
       if (answer && !isGenericAuthor(answer)) {
         questions.push({
-          monument: m,
-          kind: isRuler ? 'ruler' : 'author',
-          question: isRuler
-            ? `При ком был создан/построен «${m.name}»?`
-            : `Кто автор «${m.name}»?`,
-          expected: answer,
-          checkFn: (v) => creatorMatch(v, answer)
+          monument: m, kind: isRuler ? 'ruler' : 'author',
+          question: isRuler ? `При ком был создан/построен «${m.name}»?` : `Кто автор «${m.name}»?`,
+          expected: answer, checkFn: (v) => creatorMatch(v, answer)
         });
       }
     }
     questions.push({
-      monument: m,
-      kind: 'year',
+      monument: m, kind: 'year',
       question: `В каком году был(о) создан(о)/построен(о) «${m.name}»?`,
-      expected: m.year,
-      checkFn: (v) => yearMatch(v, m.year)
+      expected: m.year, checkFn: (v) => yearMatch(v, m.year)
     });
   }
   return shuffle(questions);
@@ -1060,6 +1215,7 @@ function buildCharacterCardsQuiz(reverse) {
     return { item, options, correctIndex: options.indexOf(item), reverse };
   });
 }
+
 function buildOneCharacterEgeRound(pool, reverse) {
   if (pool.length < 6) pool = CHARACTERS;
   const picked = shuffle([...pool]).slice(0, 6);
@@ -1075,6 +1231,7 @@ function buildOneCharacterEgeRound(pool, reverse) {
   });
   return { correct, decoys, activities: allActivities, correctForPerson, reverseActivities, reversePersons, correctForActivity };
 }
+
 function buildCharacterEgeQuiz(period) {
   const roundCount = 3;
   let pool;
@@ -1088,6 +1245,84 @@ function buildCharacterEgeQuiz(period) {
   return rounds;
 }
 
+/* --- Война и мир --- */
+function buildWarRound(criterion) {
+  let attempts = 0;
+  while (attempts < 200) {
+    const start = WAR_PEACE_DATA[Math.floor(Math.random() * WAR_PEACE_DATA.length)];
+    const startYear = extractFirstYear(start.years);
+    if (startYear === null) { attempts++; continue; }
+    const nearby = WAR_PEACE_DATA.filter(w => {
+      const y = extractFirstYear(w.years);
+      return y !== null && Math.abs(y - startYear) <= 100;
+    });
+    if (nearby.length >= 6) {
+      const picked = shuffle(nearby).slice(0, 6);
+      const correct = picked.slice(0, 4);
+      const decoys = picked.slice(4, 6);
+      const correctFacts = correct.map(w => getWarFact(w, criterion));
+      const decoyFacts = decoys.map(w => getWarFact(w, criterion));
+      const allFacts = shuffle([...correctFacts, ...decoyFacts]);
+      const correctForWar = correctFacts.map(f => allFacts.indexOf(f) + 1);
+      return { correct, decoys, facts: allFacts, correctForWar };
+    }
+    attempts++;
+  }
+  // fallback
+  const picked = shuffle(WAR_PEACE_DATA).slice(0, 6);
+  const correct = picked.slice(0, 4);
+  const decoys = picked.slice(4, 6);
+  const correctFacts = correct.map(w => getWarFact(w, criterion));
+  const decoyFacts = decoys.map(w => getWarFact(w, criterion));
+  const allFacts = shuffle([...correctFacts, ...decoyFacts]);
+  const correctForWar = correctFacts.map(f => allFacts.indexOf(f) + 1);
+  return { correct, decoys, facts: allFacts, correctForWar };
+}
+
+function buildWarQuiz(criterion) {
+  const rounds = [];
+  for (let i = 0; i < 3; i++) rounds.push(buildWarRound(criterion));
+  return rounds;
+}
+
+/* --- Хронология --- */
+function buildChronoPool() {
+  const pool = [];
+  for (const d of RUSSIAN_DATES) {
+    const y = extractFirstYear(d.date);
+    if (y && y > 800) pool.push({ event: d.event, date: d.date, year: y, source: 'russian' });
+  }
+  for (const d of WORLD_DATES) {
+    const y = extractFirstYear(d.date);
+    if (y && y > 400) pool.push({ event: d.event, date: d.date, year: y, source: 'world' });
+  }
+  return pool;
+}
+const CHRONO_POOL = buildChronoPool();
+
+function buildEasyChronoRound() {
+  const worldPool = CHRONO_POOL.filter(e => e.source === 'world');
+  const russianPool = CHRONO_POOL.filter(e => e.source === 'russian');
+  const worldCount = Math.random() < 0.5 ? 1 : 2;
+  const worldPicks = shuffle(worldPool).slice(0, worldCount);
+  const russianPicks = shuffle(russianPool).slice(0, 5 - worldCount);
+  return shuffle([...worldPicks, ...russianPicks]);
+}
+
+function buildHardChronoRound() {
+  let attempts = 0;
+  while (attempts < 300) {
+    const start = CHRONO_POOL[Math.floor(Math.random() * CHRONO_POOL.length)];
+    const startYear = start.year;
+    const nearby = CHRONO_POOL.filter(e => Math.abs(e.year - startYear) <= 75 && e.event !== start.event);
+    if (nearby.length >= 4) {
+      return shuffle([start, ...shuffle(nearby).slice(0, 4)]);
+    }
+    attempts++;
+  }
+  return shuffle(CHRONO_POOL).slice(0, 5);
+}
+
 /* =========================================================
    10. РЕНДЕР
    ========================================================= */
@@ -1099,13 +1334,18 @@ function render() {
     case 'home':                 renderHome(); break;
     case 'dateLevel':            renderDateLevel(); break;
     case 'datePeriods':          renderDatePeriods(); break;
-    case 'worldReference':       renderWorldReference(); break;
+    case 'worldReference':       renderDateReferenceScreen(); break;
+    case 'russianReference':     renderDateReferenceScreen(); break;
     case 'culture':              renderCultureMenu(); break;
     case 'reference':            renderReferenceFull(); break;
     case 'characters':           renderCharactersMenu(); break;
     case 'characterReference':   renderCharacterReference(); break;
     case 'characterEgeLevels':   renderCharacterEgeLevels(); break;
     case 'characterEgePeriods':  renderCharacterEgePeriods(); break;
+    case 'warPeace':             renderWarPeaceMenu(); break;
+    case 'warPeaceReference':    renderWarPeaceReference(); break;
+    case 'warPeaceCriteria':     renderWarPeaceCriteria(); break;
+    case 'chronologyLevels':     renderChronologyLevels(); break;
     case 'quiz':                 renderQuiz(); break;
     case 'result':               renderResult(); break;
   }
@@ -1119,7 +1359,7 @@ function header() {
 function renderHome() {
   app.innerHTML = `
     ${header()}
-    <div class="home-cards fade-in">
+    <div class="home-cards three-col fade-in">
       <div class="home-card" onclick="goDates()">
         <div class="icon">📅</div>
         <h3>Даты · Россия</h3>
@@ -1140,14 +1380,26 @@ function renderHome() {
         <h3>Персонажи</h3>
         <p>Деятели и их дела</p>
       </div>
+      <div class="home-card" onclick="goWarPeace()">
+        <div class="icon">⚔️</div>
+        <h3>Война и мир</h3>
+        <p>Войны, договоры, полководцы, итоги</p>
+      </div>
+      <div class="home-card" onclick="goChronology()">
+        <div class="icon">⏳</div>
+        <h3>Хронология</h3>
+        <p>Собери события по порядку</p>
+      </div>
     </div>
   `;
 }
-function goDates()      { state.screen = 'dateLevel'; state.dateSource = 'russian'; state.dateLevel = null; state.referenceOpen = false; render(); }
-function goWorld()      { state.screen = 'dateLevel'; state.dateSource = 'world';   state.dateLevel = null; state.referenceOpen = false; render(); }
+function goDates()      { state.screen = 'dateLevel'; state.dateSource = 'russian'; state.dateLevel = null; state.referenceOpen = false; state.selectedPeriods = null; render(); }
+function goWorld()      { state.screen = 'dateLevel'; state.dateSource = 'world';   state.dateLevel = null; state.referenceOpen = false; state.selectedPeriods = null; render(); }
 function goCulture()    { state.screen = 'culture'; state.section = 'culture'; state.referenceOpen = false; render(); }
 function goCharacters() { state.screen = 'characters'; state.characterMode = null; state.characterEgeLevel = null; state.referenceOpen = false; render(); }
-function goHome()       { state.screen = 'home'; state.quiz = null; state.dateLevel = null; state.characterMode = null; state.characterEgeLevel = null; state.referenceOpen = false; render(); }
+function goWarPeace()   { state.screen = 'warPeace'; state.warCriterion = null; state.referenceOpen = false; render(); }
+function goChronology() { state.screen = 'chronologyLevels'; state.chronoLevel = null; render(); }
+function goHome()       { state.screen = 'home'; state.quiz = null; state.dateLevel = null; state.characterMode = null; state.characterEgeLevel = null; state.referenceOpen = false; state.selectedPeriods = null; render(); }
 
 /* --- ДАТЫ: level --- */
 function renderDateLevel() {
@@ -1155,41 +1407,30 @@ function renderDateLevel() {
   const title = isWorld ? '🌍 Всеобщая история — выбери уровень' : '📅 Даты · Россия — выбери уровень';
   const sub = isWorld
     ? 'Даты мировой истории от падения Рима до XVII века'
-    : 'Отечественная история от Рюрика до 1917 года';
+    : 'Отечественная история от Рюрика до конца Гражданской войны';
 
-  const cardsHTML = isWorld ? `
-    <div class="level-cards three fade-in">
-      <div class="level-card ref" onclick="goWorldReference()">
-        <div class="icon">📖</div>
-        <h3>Хронология</h3>
-        <p>Все даты всеобщей истории по периодам. Можно листать и искать.</p>
-        <span class="tag">справочник</span>
-      </div>
-      <div class="level-card easy" onclick="pickLevel('easy')">
-        <div class="icon">🧪</div>
-        <h3>Дитя Артасова</h3>
-        <p>Обычный тест: дано событие — выбираешь один из трёх вариантов. Есть кнопка «Реверс».</p>
-        <span class="tag">тест · 3 варианта</span>
-      </div>
-      <div class="level-card hard" onclick="pickLevel('hard')">
-        <div class="icon">🔥</div>
-        <h3>Жесть ты олимпиадник</h3>
-        <p>Дано событие — сам печатаешь дату. Ошибся — увидишь правильный ответ.</p>
-        <span class="tag">печать · без вариантов</span>
-      </div>
+  const refCard = `
+    <div class="level-card ref" onclick="goDateReference()">
+      <div class="icon">📖</div>
+      <h3>Хронология</h3>
+      <p>Все даты по периодам. Можно листать и искать.</p>
+      <span class="tag">справочник</span>
     </div>
-  ` : `
-    <div class="level-cards fade-in">
+  `;
+
+  const cardsHTML = `
+    <div class="level-cards three fade-in">
+      ${refCard}
       <div class="level-card easy" onclick="pickLevel('easy')">
         <div class="icon">🧪</div>
         <h3>Дитя Артасова</h3>
-        <p>Обычный тест: дано событие — выбираешь один из трёх вариантов. Есть кнопка «Реверс».</p>
+        <p>Смешанные вопросы: иногда дата → событие, иногда событие → дата. Можно выбрать несколько разделов и подглядывать в справочник.</p>
         <span class="tag">тест · 3 варианта</span>
       </div>
       <div class="level-card hard" onclick="pickLevel('hard')">
         <div class="icon">🔥</div>
         <h3>Жесть ты олимпиадник</h3>
-        <p>Дано событие — сам печатаешь дату (год или промежуток через тире). Ошибся — увидишь правильный ответ.</p>
+        <p>Дано событие — сам печатаешь дату (год или промежуток). Ошибся — увидишь правильный ответ.</p>
         <span class="tag">печать · без вариантов</span>
       </div>
     </div>
@@ -1207,46 +1448,90 @@ function renderDateLevel() {
     ${cardsHTML}
   `;
 }
-function goWorldReference() { state.screen = 'worldReference'; state.referenceQuery = ''; render(); }
+function goDateReference() {
+  state.referenceQuery = '';
+  state.screen = state.dateSource === 'world' ? 'worldReference' : 'russianReference';
+  render();
+}
 function pickLevel(level) {
   state.dateLevel = level;
   state.screen = 'datePeriods';
+  state.selectedPeriods = level === 'easy' ? null : null;
   render();
 }
+
 function renderDatePeriods() {
   const isWorld = state.dateSource === 'world';
   const periods = isWorld ? WORLD_PERIODS : RU_DATE_PERIODS;
   const data = isWorld ? WORLD_DATES : RUSSIAN_DATES;
+  const isMulti = state.dateLevel === 'easy';
+
+  if (isMulti && state.selectedPeriods === null) {
+    state.selectedPeriods = [...periods];
+  }
+
   const counts = {};
   periods.forEach(p => {
     let list = data.filter(d => d.period === p);
     if (state.dateLevel === 'hard') list = list.filter(d => isTypeable(d.date));
     counts[p] = list.length;
   });
-  const items = periods.map(p => {
-    const n = counts[p] || 0;
-    const disabled = n === 0;
-    return `
-      <div class="period-item ${disabled ? 'disabled' : ''}"
-           ${disabled ? '' : `onclick="startDateQuiz('${esc(p).replace(/'/g, "\\'")}')"`}>
-        <span>${esc(p)}</span>
-        <span class="count">${disabled ? '<span class="soon-badge">скоро</span>' : n + ' дат'}</span>
-      </div>
-    `;
-  }).join('');
+
   let total = data;
   if (state.dateLevel === 'hard') total = total.filter(d => isTypeable(d.date));
+
   const title = isWorld ? '🌍 Всеобщая история' : '📅 Даты · Россия';
   const levelBadge = state.dateLevel === 'hard'
     ? '<span style="color:#c62828">· 🔥 Режим: печатать дату</span>'
-    : '<span style="color:#2e7d32">· 🧪 Режим: тест</span>';
+    : '<span style="color:#2e7d32">· 🧪 Режим: тест (отметь разделы)</span>';
 
-  const refLink = isWorld
-    ? `<div class="period-item" onclick="goWorldReference()" style="border-color:var(--gold);">
-         <span>📖 Хронология (справочник)</span>
-         <span class="count">${WORLD_DATES.length} дат</span>
-       </div>`
-    : '';
+  let itemsHTML;
+  if (isMulti) {
+    const allSelected = state.selectedPeriods.length === periods.length;
+    itemsHTML = `
+      <div class="period-item ${allSelected ? 'selected' : ''}" onclick="toggleMix()">
+        <span>🎲 Все разделы (микс)</span>
+        <div class="check-row"><input type="checkbox" ${allSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleMix();"></div>
+      </div>
+    ` + periods.map(p => {
+      const n = counts[p] || 0;
+      const disabled = n === 0;
+      const selected = state.selectedPeriods.includes(p);
+      return `
+        <div class="period-item ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''}"
+             ${disabled ? '' : `onclick="togglePeriod('${esc(p).replace(/'/g, "\\'")}')"`}>
+          <span>${esc(p)}</span>
+          <div class="check-row">
+            <span class="count" style="margin-right:8px;">${n} дат</span>
+            <input type="checkbox" ${selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}
+                   onclick="event.stopPropagation(); togglePeriod('${esc(p).replace(/'/g, "\\'")}')">
+          </div>
+        </div>
+      `;
+    }).join('');
+    itemsHTML += `
+      <div style="text-align:center; margin-top: 18px;">
+        <button class="btn-primary" style="font-size:17px; padding: 14px 40px;" onclick="startMultiPeriodQuiz()">ПОЕХАЛИ! →</button>
+      </div>
+    `;
+  } else {
+    itemsHTML = `
+      <div class="period-item" onclick="startDateQuiz('all')">
+        <span>🎲 Все периоды (микс)</span>
+        <span class="count">${total.length} дат</span>
+      </div>
+    ` + periods.map(p => {
+      const n = counts[p] || 0;
+      const disabled = n === 0;
+      return `
+        <div class="period-item ${disabled ? 'disabled' : ''}"
+             ${disabled ? '' : `onclick="startDateQuiz('${esc(p).replace(/'/g, "\\'")}')"`}>
+          <span>${esc(p)}</span>
+          <span class="count">${disabled ? '<span class="soon-badge">скоро</span>' : n + ' дат'}</span>
+        </div>
+      `;
+    }).join('');
+  }
 
   app.innerHTML = `
     ${header()}
@@ -1257,27 +1542,47 @@ function renderDatePeriods() {
         <div class="section-sub" style="margin-bottom:0">${levelBadge}</div>
       </div>
     </div>
-    <div class="period-list fade-in">
-      ${refLink}
-      <div class="period-item" onclick="startDateQuiz('all')">
-        <span>🎲 Все периоды (микс)</span>
-        <span class="count">${total.length} дат</span>
-      </div>
-      ${items}
-    </div>
+    <div class="period-list fade-in">${itemsHTML}</div>
   `;
+}
+function toggleMix() {
+  const periods = state.dateSource === 'world' ? WORLD_PERIODS : RU_DATE_PERIODS;
+  if (state.selectedPeriods.length === periods.length) {
+    state.selectedPeriods = [];
+  } else {
+    state.selectedPeriods = [...periods];
+  }
+  render();
+}
+function togglePeriod(p) {
+  const idx = state.selectedPeriods.indexOf(p);
+  if (idx >= 0) state.selectedPeriods.splice(idx, 1);
+  else state.selectedPeriods.push(p);
+  render();
+}
+function startMultiPeriodQuiz() {
+  if (!state.selectedPeriods || state.selectedPeriods.length === 0) {
+    alert('Выбери хотя бы один раздел!');
+    return;
+  }
+  const periods = state.dateSource === 'world' ? WORLD_PERIODS : RU_DATE_PERIODS;
+  if (state.selectedPeriods.length === periods.length) startDateQuiz('all');
+  else startDateQuiz([...state.selectedPeriods]);
 }
 function backToLevel() { state.screen = 'dateLevel'; render(); }
 
-/* --- Мировая хронология (полная страница) --- */
-function renderWorldReference() {
+/* --- Справочник дат --- */
+function renderDateReferenceScreen() {
+  const isWorld = state.dateSource === 'world' || state.screen === 'worldReference';
+  const title = isWorld ? '📖 Хронология всеобщей истории' : '📖 Хронология истории России';
+  const sub = isWorld ? 'Все даты по периодам' : 'Все даты по периодам';
   app.innerHTML = `
     ${header()}
     <div class="back-bar">
       <button class="arrow-btn" onclick="backToLevel()">←</button>
       <div>
-        <div class="section-title">📖 Хронология всеобщей истории</div>
-        <div class="section-sub" style="margin-bottom:0">Все даты по периодам</div>
+        <div class="section-title">${title}</div>
+        <div class="section-sub" style="margin-bottom:0">${sub}</div>
       </div>
     </div>
     <div class="ref-full-wrap fade-in">
@@ -1285,7 +1590,7 @@ function renderWorldReference() {
              value="${esc(state.referenceQuery)}"
              oninput="updateReferenceQuery(this.value)">
       <div id="refTableWrap" style="max-height:70vh; overflow-y:auto;">
-        ${worldReferenceTableHTML(state.referenceQuery)}
+        ${isWorld ? worldReferenceTableHTML(state.referenceQuery) : russianReferenceTableHTML(state.referenceQuery)}
       </div>
     </div>
   `;
@@ -1352,7 +1657,9 @@ function updateReferenceQuery(v) {
   if (!wrap) return;
   if (state.screen === 'reference') wrap.innerHTML = referenceTableHTML(v);
   else if (state.screen === 'worldReference') wrap.innerHTML = worldReferenceTableHTML(v);
+  else if (state.screen === 'russianReference') wrap.innerHTML = russianReferenceTableHTML(v);
   else if (state.screen === 'characterReference') wrap.innerHTML = characterReferenceTableHTML(v);
+  else if (state.screen === 'warPeaceReference') wrap.innerHTML = warReferenceTableHTML(v);
 }
 
 /* --- ПЕРСОНАЖИ --- */
@@ -1411,11 +1718,7 @@ function renderCharacterReference() {
   `;
 }
 
-function goCharacterEgeLevels() {
-  state.screen = 'characterEgeLevels';
-  state.characterMode = 'ege';
-  render();
-}
+function goCharacterEgeLevels() { state.screen = 'characterEgeLevels'; state.characterMode = 'ege'; render(); }
 function renderCharacterEgeLevels() {
   app.innerHTML = `
     ${header()}
@@ -1478,16 +1781,131 @@ function renderCharacterEgePeriods() {
   `;
 }
 
+/* --- ВОЙНА И МИР --- */
+function renderWarPeaceMenu() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="section-title">⚔️ Война и мир</div>
+        <div class="section-sub" style="margin-bottom:0">Войны, договоры, полководцы, итоги</div>
+      </div>
+    </div>
+    <div class="level-cards fade-in">
+      <div class="level-card ref" onclick="goWarPeaceReference()">
+        <div class="icon">📖</div>
+        <h3>Справочник «Война и мир»</h3>
+        <p>Все войны: годы, мирные договоры, полководцы, итоги. Можно искать.</p>
+        <span class="tag">справочник</span>
+      </div>
+      <div class="level-card hard" onclick="goWarPeaceCriteria()">
+        <div class="icon">🔥</div>
+        <h3>Задание ЕГЭ</h3>
+        <p>Соотнеси войны (А–Г) с их датами / миром / полководцами / итогами (1–6). Войны — в радиусе 100 лет.</p>
+        <span class="tag">соответствие · 4 × 6</span>
+      </div>
+    </div>
+  `;
+}
+function goWarPeaceReference() { state.screen = 'warPeaceReference'; state.referenceQuery = ''; render(); }
+function renderWarPeaceReference() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goWarPeace()">←</button>
+      <div>
+        <div class="section-title">📖 Справочник «Война и мир»</div>
+        <div class="section-sub" style="margin-bottom:0">Войны России, их мир, полководцы и итоги</div>
+      </div>
+    </div>
+    <div class="ref-full-wrap fade-in">
+      <input class="ref-search" type="text" placeholder="🔎 Поиск по войне, году, полководцу, итогу…"
+             value="${esc(state.referenceQuery)}"
+             oninput="updateReferenceQuery(this.value)">
+      <div id="refTableWrap" style="max-height:70vh; overflow-y:auto;">
+        ${warReferenceTableHTML(state.referenceQuery)}
+      </div>
+    </div>
+  `;
+}
+function goWarPeaceCriteria() { state.screen = 'warPeaceCriteria'; render(); }
+function renderWarPeaceCriteria() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goWarPeace()">←</button>
+      <div>
+        <div class="section-title">⚔️ Задание ЕГЭ — выбери критерий</div>
+        <div class="section-sub" style="margin-bottom:0">По какому критерию собирать задание?</div>
+      </div>
+    </div>
+    <div class="level-cards fade-in" style="grid-template-columns: repeat(2, 1fr);">
+      <div class="level-card easy" onclick="startWarQuiz('dates')">
+        <div class="icon">📅</div>
+        <h3>По датам</h3>
+        <p>Соотнеси войну с годами её проведения.</p>
+        <span class="tag">годы войны</span>
+      </div>
+      <div class="level-card easy" onclick="startWarQuiz('peace')">
+        <div class="icon">📜</div>
+        <h3>По миру</h3>
+        <p>Соотнеси войну с мирным договором, которым она завершилась.</p>
+        <span class="tag">мирный договор</span>
+      </div>
+      <div class="level-card hard" onclick="startWarQuiz('commanders')">
+        <div class="icon">⚔️</div>
+        <h3>По полководцам</h3>
+        <p>Соотнеси войну с её ключевыми полководцами.</p>
+        <span class="tag">полководцы</span>
+      </div>
+      <div class="level-card hard" onclick="startWarQuiz('outcome')">
+        <div class="icon">🏆</div>
+        <h3>По итогам</h3>
+        <p>Соотнеси войну с её главным итогом.</p>
+        <span class="tag">итог войны</span>
+      </div>
+    </div>
+  `;
+}
+
+/* --- ХРОНОЛОГИЯ --- */
+function renderChronologyLevels() {
+  app.innerHTML = `
+    ${header()}
+    <div class="back-bar">
+      <button class="arrow-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="section-title">⏳ Хронология — выбери уровень</div>
+        <div class="section-sub" style="margin-bottom:0">Расставь 5 событий в хронологическом порядке</div>
+      </div>
+    </div>
+    <div class="level-cards fade-in">
+      <div class="level-card easy" onclick="startChrono('easy')">
+        <div class="icon">🧪</div>
+        <h3>Ученик летописца</h3>
+        <p>5 случайных событий из русской и мировой истории. Обязательно 1–2 события из мировой истории.</p>
+        <span class="tag">лёгкий · случайные</span>
+      </div>
+      <div class="level-card hard" onclick="startChrono('hard')">
+        <div class="icon">🔥</div>
+        <h3>Хронолог</h3>
+        <p>5 событий с разбросом не более 75 лет. Ошибиться легче!</p>
+        <span class="tag">сложный · узкий интервал</span>
+      </div>
+    </div>
+  `;
+}
+
 /* --- СТАРТЫ ВИКТОРИН --- */
 function startDateQuiz(period) {
-  const reverse = false;
-  const questions = buildDateQuiz(state.dateSource, period, reverse, state.dateLevel);
+  const questions = buildDateQuiz(state.dateSource, period, state.dateLevel);
   state.section = 'dates';
   state.period = period;
   state.quiz = {
     questions, index: 0,
     answers: new Array(questions.length).fill(null),
-    reverse, locked: new Array(questions.length).fill(false)
+    locked: new Array(questions.length).fill(false)
   };
   state.referenceOpen = false;
   state.screen = 'quiz';
@@ -1554,9 +1972,47 @@ function startCharacterEge(period) {
   render();
 }
 
+function startWarQuiz(criterion) {
+  state.section = 'war';
+  state.warCriterion = criterion;
+  state.period = 'all';
+  const rounds = buildWarQuiz(criterion);
+  state.quiz = {
+    mode: 'war', rounds, index: 0,
+    answers: rounds.map(() => [null, null, null, null]),
+    locked: rounds.map(() => false),
+    reverse: false
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+
+function startChrono(level) {
+  state.section = 'chrono';
+  state.chronoLevel = level;
+  const rounds = [];
+  for (let i = 0; i < 3; i++) {
+    const originalItems = level === 'easy' ? buildEasyChronoRound() : buildHardChronoRound();
+    rounds.push({
+      originalItems,
+      items: shuffle([...originalItems]),
+      checked: false,
+      correct: null
+    });
+  }
+  state.quiz = {
+    mode: 'chrono', rounds, index: 0, reverse: false
+  };
+  state.referenceOpen = false;
+  state.screen = 'quiz';
+  render();
+}
+
 /* --- РЕВЕРС --- */
 function restartReverse() {
   const q = state.quiz;
+  if (state.section === 'dates') return; // реверс в датах отключён
   if (state.section === 'artasov') {
     q.reverse = !q.reverse;
     q.index = 0;
@@ -1585,14 +2041,6 @@ function restartReverse() {
     render();
     return;
   }
-  const reverse = !q.reverse;
-  const questions = buildDateQuiz(state.dateSource, state.period, reverse, state.dateLevel);
-  state.quiz = {
-    questions, index: 0,
-    answers: new Array(questions.length).fill(null),
-    reverse, locked: new Array(questions.length).fill(false)
-  };
-  render();
 }
 
 /* --- Справочник (боковая панель) --- */
@@ -1614,6 +2062,8 @@ function renderQuiz() {
   if (state.section === 'characters' && q.mode === 'cards') { renderCharacterCardsQuiz(); return; }
   if (state.section === 'artasov') { renderArtasovQuiz(); return; }
   if (state.section === 'olimpiadnik') { renderOlimpiadnikQuiz(); return; }
+  if (state.section === 'war') { renderWarQuiz(); return; }
+  if (state.section === 'chrono') { renderChronoQuiz(); return; }
 
   /* --- ДАТЫ --- */
   const item = q.questions[q.index];
@@ -1622,7 +2072,8 @@ function renderQuiz() {
   const selected = q.answers[q.index];
   const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
   const progressPct = (q.index / total) * 100;
-  const showRef = state.dateSource === 'world';
+  const showRef = !isTyping;
+  const qReverse = item.reverse; // рандомный реверс на каждый вопрос
 
   let questionHTML = '';
   let optionsHTML = '';
@@ -1653,7 +2104,7 @@ function renderQuiz() {
       ` : ''}
     `;
   } else {
-    if (!q.reverse) {
+    if (!qReverse) {
       questionHTML = `<div class="q-label">Что произошло в это время?</div><div class="q-text">${esc(item.item.date)}</div>`;
       optionsHTML = item.options.map((opt, i) => {
         let cls = 'option';
@@ -1676,8 +2127,10 @@ function renderQuiz() {
     }
   }
 
-  const showReverse = !isTyping;
   const refBtnLabel = state.referenceOpen ? '📖 Убрать справочник' : '📖 Подглянуть в справочник';
+  const refTitle = state.dateSource === 'world' ? '📖 Хронология' : '📖 Хронология';
+  const refSub = state.dateSource === 'world' ? 'Всеобщая история — все даты по периодам' : 'История России — все даты по периодам';
+  const refTable = state.dateSource === 'world' ? worldReferenceTableHTML('') : russianReferenceTableHTML('');
 
   const inner = `
     <div class="quiz-top">
@@ -1685,11 +2138,11 @@ function renderQuiz() {
       <div class="progress-text">Вопрос ${q.index + 1} из ${total}</div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         ${showRef ? `<button class="mini-btn primary" onclick="toggleReference()">${refBtnLabel}</button>` : ''}
-        ${showReverse ? `<button class="mini-btn" onclick="restartReverse()" title="Реверс">🔁 Реверс</button>` : ''}
         <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
       </div>
     </div>
     <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    ${questionGridHTML()}
     <div class="question-box fade-in">${questionHTML}</div>
     <div class="options fade-in">${optionsHTML}</div>
   `;
@@ -1699,9 +2152,9 @@ function renderQuiz() {
       <div class="ref-layout open">
         <div class="ref-main">${inner}</div>
         <aside class="ref-side">
-          <div class="ref-title">📖 Хронология</div>
-          <div class="ref-sub">Всеобщая история — все даты по периодам</div>
-          <div id="refSideWrap">${worldReferenceTableHTML('')}</div>
+          <div class="ref-title">${refTitle}</div>
+          <div class="ref-sub">${refSub}</div>
+          <div id="refSideWrap">${refTable}</div>
         </aside>
       </div>
     `;
@@ -1714,6 +2167,38 @@ function renderQuiz() {
       const inp = document.getElementById('dateInput');
       if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
     }, 60);
+  }
+}
+
+/* --- Навигация по вопросам (квадратики) --- */
+function questionGridHTML() {
+  const q = state.quiz;
+  if (!q || !q.questions) return '';
+  const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
+  const squares = [];
+  for (let i = 0; i < q.questions.length; i++) {
+    const isCurrent = i === q.index;
+    const isLocked = q.locked[i];
+    if (!isCurrent && !isLocked) continue;
+    let cls = 'q-num';
+    if (isCurrent) cls += ' q-num-current';
+    else if (isLocked) {
+      const correct = isTyping
+        ? (q.answers[i] && q.answers[i].correct)
+        : (q.answers[i] === q.questions[i].correctIndex);
+      cls += correct ? ' q-num-correct' : ' q-num-wrong';
+    }
+    squares.push(`<button class="${cls}" onclick="jumpToQuestion(${i})" title="Вопрос ${i+1}">${i+1}</button>`);
+  }
+  return `<div class="q-grid">${squares.join('')}</div>`;
+}
+function jumpToQuestion(idx) {
+  clearTimeout(advanceTimer);
+  const q = state.quiz;
+  if (!q) return;
+  if (idx >= 0 && idx < q.questions.length) {
+    q.index = idx;
+    render();
   }
 }
 
@@ -2085,6 +2570,234 @@ function prevEgeRound() {
   if (q.index > 0) { q.index--; render(); }
 }
 
+/* --- Война и мир: задание --- */
+function renderWarQuiz() {
+  const q = state.quiz;
+  const round = q.rounds[q.index];
+  const total = q.rounds.length;
+  const userAns = q.answers[q.index];
+  const locked = q.locked[q.index];
+  const progressPct = (q.index / total) * 100;
+  const criterion = state.warCriterion;
+
+  function numBtnClass(warIdx, num) {
+    const chosen = userAns[warIdx];
+    if (!locked) return chosen === num ? 'ege-num-btn selected' : 'ege-num-btn';
+    if (round.correctForWar[warIdx] === num) return 'ege-num-btn correct';
+    if (chosen === num && chosen !== round.correctForWar[warIdx]) return 'ege-num-btn wrong';
+    return 'ege-num-btn';
+  }
+
+  const letters = ['А','Б','В','Г'];
+  const rowsHTML = round.correct.map((w, i) => `
+    <div class="ege-row">
+      <div class="ege-letter">${letters[i]}</div>
+      <div class="ege-prompt">${esc(w.war)}</div>
+      <div class="ege-nums">
+        ${[1,2,3,4,5,6].map(n => `
+          <button class="${numBtnClass(i, n)}"
+            ${locked ? 'disabled' : `onclick="pickWarNum(${i}, ${n})`}
+            data-n="${n}">${n}</button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const rightListHTML = round.facts.map((f, i) => `
+    <div class="opt-row">
+      <div class="num-badge">${i + 1}</div>
+      <div class="opt-text">${esc(f)}</div>
+    </div>
+  `).join('');
+
+  const allFilled = userAns.every(v => v !== null);
+  const correctCount = locked
+    ? round.correctForWar.reduce((acc, correctNum, i) => acc + (userAns[i] === correctNum ? 1 : 0), 0)
+    : 0;
+
+  const inner = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevWarRound()"'} title="Назад">←</button>
+      <div class="progress-text">Задание ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in" style="padding: 12px 14px; text-align:left;">
+      <div class="q-label" style="margin-bottom:6px;">
+        ${esc(getWarCriterionTitle(criterion))} — соотнеси ВОЙНЫ (А–Г) с ${esc(getWarCriterionLabel(criterion))} (1–6)
+      </div>
+    </div>
+    <div class="ege-table fade-in">${rowsHTML}</div>
+    <div class="ege-options-box fade-in">${rightListHTML}</div>
+    ${!locked ? `
+      <div style="text-align:center; margin-top: 8px;">
+        <button class="btn-primary" ${allFilled ? '' : 'disabled'} onclick="checkWarRound()">Проверить</button>
+      </div>
+    ` : `
+      <div class="feedback ${correctCount === 4 ? 'fb-correct' : 'fb-wrong'}" style="text-align:center;">
+        ${correctCount === 4
+          ? `✅ Всё верно! (4/4)`
+          : `❌ Правильно: ${correctCount} из 4. Смотри подсветку.`}
+      </div>
+      <div style="text-align:center; margin-top: 14px;">
+        <button class="btn-primary" onclick="nextWarRound()">${q.index < total - 1 ? 'Дальше →' : 'Завершить'}</button>
+      </div>
+    `}
+  `;
+
+  app.innerHTML = inner;
+}
+function pickWarNum(warIdx, num) {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const arr = q.answers[q.index];
+  arr[warIdx] = arr[warIdx] === num ? null : num;
+  renderWarQuiz();
+}
+function checkWarRound() {
+  const q = state.quiz;
+  if (q.locked[q.index]) return;
+  const arr = q.answers[q.index];
+  if (arr.some(v => v === null)) return;
+  q.locked[q.index] = true;
+  renderWarQuiz();
+}
+function nextWarRound() {
+  const q = state.quiz;
+  if (q.index < q.rounds.length - 1) { q.index++; render(); }
+  else { state.screen = 'result'; render(); }
+}
+function prevWarRound() {
+  const q = state.quiz;
+  if (q.index > 0) { q.index--; render(); }
+}
+
+/* --- Хронология --- */
+function renderChronoQuiz() {
+  const q = state.quiz;
+  const round = q.rounds[q.index];
+  const total = q.rounds.length;
+  const progressPct = (q.index / total) * 100;
+
+  // Вычислим правильную последовательность
+  const correctOrder = [...round.originalItems].sort((a,b) => a.year - b.year);
+
+  const itemsHTML = round.items.map((it, i) => {
+    let cls = 'chrono-item';
+    if (round.checked) {
+      if (round.items[i].event === correctOrder[i].event) cls += ' chrono-correct';
+      else cls += ' chrono-wrong';
+    }
+    return `
+      <div class="${cls}"
+           draggable="${round.checked ? 'false' : 'true'}"
+           data-idx="${i}"
+           ondragstart="chronoDragStart(event, ${i})"
+           ondragover="chronoDragOver(event)"
+           ondrop="chronoDrop(event, ${i})"
+           ondragend="chronoDragEnd(event)">
+        <div class="chrono-handle">⋮⋮</div>
+        <div class="chrono-body">
+          <div>${esc(it.event)}</div>
+        </div>
+        <div class="chrono-arrows">
+          <button class="chrono-arrow" onclick="chronoMove(${i}, -1)" ${round.checked || i === 0 ? 'disabled' : ''}>▲</button>
+          <button class="chrono-arrow" onclick="chronoMove(${i}, 1)" ${round.checked || i === round.items.length - 1 ? 'disabled' : ''}>▼</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const correctCount = round.checked
+    ? round.items.reduce((acc, it, i) => acc + (it.event === correctOrder[i].event ? 1 : 0), 0)
+    : 0;
+
+  app.innerHTML = `
+    <div class="quiz-top">
+      <button class="arrow-btn" ${q.index === 0 ? 'disabled' : 'onclick="prevChronoRound()"'} title="Назад">←</button>
+      <div class="progress-text">Задание ${q.index + 1} из ${total}</div>
+      <div style="display:flex; gap:8px;">
+        <button class="mini-btn" onclick="quitQuiz()" title="В меню">✕</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${progressPct}%"></div></div>
+    <div class="question-box fade-in" style="padding: 14px;">
+      <div class="q-label" style="margin-bottom:6px;">Расставь события в хронологическом порядке</div>
+      <div class="q-desc">Перетаскивай блоки или используй стрелки ▲▼</div>
+    </div>
+    <div class="chrono-list fade-in">${itemsHTML}</div>
+    ${!round.checked ? `
+      <div style="text-align:center; margin-top: 8px;">
+        <button class="btn-primary" onclick="checkChrono()">Проверить</button>
+      </div>
+    ` : `
+      <div class="feedback ${correctCount === 5 ? 'fb-correct' : 'fb-wrong'}" style="text-align:center;">
+        ${correctCount === 5
+          ? `✅ Всё верно! (5/5)`
+          : `❌ На своих местах: ${correctCount} из 5. Смотри подсветку.`}
+      </div>
+      <div style="text-align:center; margin-top: 14px;">
+        <button class="btn-primary" onclick="nextChronoRound()">${q.index < total - 1 ? 'Дальше →' : 'Завершить'}</button>
+      </div>
+    `}
+  `;
+}
+
+let chronoDragSrcIdx = null;
+function chronoDragStart(e, idx) {
+  chronoDragSrcIdx = idx;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function chronoDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drop-target');
+}
+function chronoDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.chrono-item').forEach(el => el.classList.remove('drop-target'));
+}
+function chronoDrop(e, targetIdx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drop-target');
+  if (chronoDragSrcIdx === null || chronoDragSrcIdx === targetIdx) return;
+  const q = state.quiz;
+  if (q.rounds[q.index].checked) return;
+  const items = q.rounds[q.index].items;
+  const [moved] = items.splice(chronoDragSrcIdx, 1);
+  items.splice(targetIdx, 0, moved);
+  chronoDragSrcIdx = null;
+  render();
+}
+function chronoMove(idx, dir) {
+  const q = state.quiz;
+  const round = q.rounds[q.index];
+  if (round.checked) return;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= round.items.length) return;
+  [round.items[idx], round.items[newIdx]] = [round.items[newIdx], round.items[idx]];
+  render();
+}
+function checkChrono() {
+  const q = state.quiz;
+  const round = q.rounds[q.index];
+  if (round.checked) return;
+  round.checked = true;
+  render();
+}
+function nextChronoRound() {
+  const q = state.quiz;
+  if (q.index < q.rounds.length - 1) { q.index++; render(); }
+  else { state.screen = 'result'; render(); }
+}
+function prevChronoRound() {
+  const q = state.quiz;
+  if (q.index > 0) { q.index--; render(); }
+}
+
 /* --- ОТВЕТ (тесты, даты) --- */
 let advanceTimer = null;
 function answer(i) {
@@ -2135,6 +2848,10 @@ function quitQuiz() {
     if (state.characterMode === 'ege' && state.characterEgeLevel === 'hard') state.screen = 'characterEgePeriods';
     else if (state.characterMode === 'ege') state.screen = 'characterEgeLevels';
     else state.screen = 'characters';
+  } else if (state.section === 'war') {
+    state.screen = 'warPeaceCriteria';
+  } else if (state.section === 'chrono') {
+    state.screen = 'chronologyLevels';
   } else {
     state.screen = 'datePeriods';
   }
@@ -2166,6 +2883,31 @@ function renderResult() {
       let ok = true;
       for (let i = 0; i < 4; i++) if (ans[i] !== correctArr[i]) { ok = false; break; }
       if (ok) correct++;
+    });
+    pct = Math.round((correct / total) * 100);
+    vv = v(pct);
+    scoreDisplay = correct;
+    totalDisplay = total;
+  } else if (state.section === 'war') {
+    total = q.rounds.length;
+    correct = 0;
+    q.rounds.forEach((round, ri) => {
+      const ans = q.answers[ri];
+      let ok = true;
+      for (let i = 0; i < 4; i++) if (ans[i] !== round.correctForWar[i]) { ok = false; break; }
+      if (ok) correct++;
+    });
+    pct = Math.round((correct / total) * 100);
+    vv = v(pct);
+    scoreDisplay = correct;
+    totalDisplay = total;
+  } else if (state.section === 'chrono') {
+    total = q.rounds.length;
+    correct = 0;
+    q.rounds.forEach(r => {
+      const correctOrder = [...r.originalItems].sort((a,b) => a.year - b.year);
+      const allOk = r.items.every((it, i) => it.event === correctOrder[i].event);
+      if (allOk) correct++;
     });
     pct = Math.round((correct / total) * 100);
     vv = v(pct);
@@ -2209,7 +2951,7 @@ function renderResult() {
   }
 
   const isTyping = state.section === 'dates' && state.dateLevel === 'hard';
-  const noReverse = isTyping || state.section === 'olimpiadnik';
+  const noReverse = isTyping || state.section === 'olimpiadnik' || state.section === 'dates' || state.section === 'war' || state.section === 'chrono';
 
   app.innerHTML = `
     ${header()}
@@ -2231,6 +2973,8 @@ function repeatQuiz() {
   if (state.section === 'dates') startDateQuiz(state.period);
   else if (state.section === 'artasov') startArtasov();
   else if (state.section === 'olimpiadnik') startOlimpiadnik();
+  else if (state.section === 'war') startWarQuiz(state.warCriterion);
+  else if (state.section === 'chrono') startChrono(state.chronoLevel);
   else if (state.section === 'characters') {
     if (state.characterMode === 'ege') startCharacterEge(state.period);
     else startCharacterCards();
